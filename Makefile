@@ -4,11 +4,12 @@ CFLAGS  = -c -Wall
 LIB_DIR  = lib
 DIST_DIR  = dist
 OBJECTS = $(DIST_DIR)/main.o\
-	  $(DIST_DIR)/application.o
+	  $(DIST_DIR)/application.o\
+	  $(DIST_DIR)/memory.o -lm # "-lm" links math.h implementaton to memory.o
 
 # Syntax:
 # target: dependencies
-# 	command
+# command
 
 # A full, incremental build (also, as first rule, the default)
 default: link
@@ -26,6 +27,11 @@ $(DIST_DIR)/main.o: $(LIB_DIR)/main.c
 # Depends on application.c to be present in order to compile
 $(DIST_DIR)/application.o: $(LIB_DIR)/application.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/application.o
+
+# Target compiles memory.c into an object (.o) file
+# Depends on memory.c to be present in order to compile
+$(DIST_DIR)/memory.o: $(LIB_DIR)/memory.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/memory.o
 
 # Remove all built files, and re-create the dist directory
 clean:

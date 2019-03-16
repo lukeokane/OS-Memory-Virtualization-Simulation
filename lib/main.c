@@ -1,8 +1,10 @@
-#include "./application.h" 
+#include "./application.h"
  
 int main() {
  
-	testMethod();
+	Application application = new_application();
+	// Start application
+	application.start();
 
 	return 0;
 }
