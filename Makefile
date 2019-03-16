@@ -5,7 +5,11 @@ LIB_DIR  = lib
 DIST_DIR  = dist
 OBJECTS = $(DIST_DIR)/main.o\
 	  $(DIST_DIR)/application.o\
-	  $(DIST_DIR)/memory.o -lm # "-lm" links math.h implementaton to memory.o
+	  $(DIST_DIR)/memory.o -lm\
+	  $(DIST_DIR)/page_entry.o\
+	  $(DIST_DIR)/frame_entry.o
+
+# "-lm" links math.h implementaton to memory.o
 
 # Syntax:
 # target: dependencies
@@ -32,6 +36,16 @@ $(DIST_DIR)/application.o: $(LIB_DIR)/application.c
 # Depends on memory.c to be present in order to compile
 $(DIST_DIR)/memory.o: $(LIB_DIR)/memory.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/memory.o
+
+# Target compiles page_entry.c into an object (.o) file
+# Depends on page_entry.c to be present in order to compile
+$(DIST_DIR)/page_entry.o: $(LIB_DIR)/page_entry.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/page_entry.o
+
+# Target compiles frame_entry.c into an object (.o) file
+# Depends on frame_entry.c to be present in order to compile
+$(DIST_DIR)/frame_entry.o: $(LIB_DIR)/frame_entry.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/frame_entry.o
 
 # Remove all built files, and re-create the dist directory
 clean:

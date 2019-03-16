@@ -19,11 +19,23 @@ Application new_application() {
  * @return void
  *
  */
-void start() {
+void start(struct Application* app) {
 
+	clearScreen();
+	printf("Application started...\nCreating physical memory...\n");
 	// Create physical memory sufficient to store...
   // ... all bytes for system address space
-	Memory memory = new_memory(16);
+	unsigned char addressSize = 16;
+	app->memory = new_memory(addressSize);
+}
+
+/* 
+ * Skip 10 lines to clear screen space for new action
+ * @return void
+ *
+ */
+void clearScreen() {
+	printf("\n\n\n\n\n\n\n\n\n\n");
 }
 
 

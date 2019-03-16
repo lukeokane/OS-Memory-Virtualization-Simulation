@@ -1,10 +1,12 @@
 #ifndef APPLICATION_H
 #define  APPLICATION_H
+#include "memory.h"
 
 // data type for defining the application
-typedef struct {
+typedef struct Application {
 
 	void (*start)();
+  Memory memory;
 
 } Application;
 
@@ -12,6 +14,8 @@ typedef struct {
 Application new_application();
 
 // Start application function
-void start();
+void start(struct Application* app);
+
+void clearScreen();
 
 #endif
