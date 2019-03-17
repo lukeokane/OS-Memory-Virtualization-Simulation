@@ -1,16 +1,6 @@
 #ifndef MEMORY_H
 #define MEMORY_H
-#include "page_entry.h"
-#include "frame_entry.h"
-
-// data type that allows storage of different ...
-// ... data types in same memory space
-typedef struct Address {
-	union {
-		struct PageEntry page_entry;
-		struct FrameEntry frame_entry;
-	};
-} Address;
+#include "address.h"
 
 // data type for defining memory
 typedef struct Memory {

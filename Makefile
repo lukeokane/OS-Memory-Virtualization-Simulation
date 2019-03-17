@@ -47,6 +47,11 @@ $(DIST_DIR)/page_entry.o: $(LIB_DIR)/page_entry.c
 $(DIST_DIR)/frame_entry.o: $(LIB_DIR)/frame_entry.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/frame_entry.o
 
+# Target compiles address.c into an object (.o) file
+# Depends on address.c to be present in order to compile
+$(DIST_DIR)/address.o: $(LIB_DIR)/address.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/address.o
+
 # Remove all built files, and re-create the dist directory
 clean:
 	rm -rf ./$(DIST_DIR) && mkdir $(DIST_DIR)
