@@ -5,9 +5,13 @@
 // data type for defining the application
 typedef struct Application {
 
-	void (*start)();
+	// Functions
+	void (*start)(struct Application* app);
+	void (*clear_screen)();
+	
+	// Member variables
   Memory memory;
-
+	
 } Application;
 
 // Instance with data type functions instantiated
@@ -16,6 +20,7 @@ Application new_application();
 // Start application function
 void start(struct Application* app);
 
-void clearScreen();
+// Skip lines on terminal to clear view
+void clear_screen();
 
 #endif

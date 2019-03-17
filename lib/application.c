@@ -10,7 +10,7 @@
  */
 Application new_application() {
 
-	Application application = { start };
+	Application application = { start, clear_screen };
 	return application;
 }
 
@@ -21,7 +21,7 @@ Application new_application() {
  */
 void start(struct Application* app) {
 
-	clearScreen();
+	app->clear_screen();
 	printf("Application started...\nCreating physical memory...\n");
 	// Create physical memory sufficient to store...
   // ... all bytes for system address space
@@ -34,7 +34,7 @@ void start(struct Application* app) {
  * @return void
  *
  */
-void clearScreen() {
+void clear_screen() {
 	printf("\n\n\n\n\n\n\n\n\n\n");
 }
 
