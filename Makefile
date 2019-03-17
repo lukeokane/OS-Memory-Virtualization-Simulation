@@ -7,7 +7,8 @@ OBJECTS = $(DIST_DIR)/main.o\
 	  $(DIST_DIR)/application.o\
 	  $(DIST_DIR)/memory.o -lm\
 	  $(DIST_DIR)/page_entry.o\
-	  $(DIST_DIR)/frame_entry.o
+	  $(DIST_DIR)/frame_entry.o\
+	  $(DIST_DIR)/address.o\
 
 # "-lm" links math.h implementaton to memory.o
 
