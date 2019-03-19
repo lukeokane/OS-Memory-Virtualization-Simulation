@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "application.h"
-#include "memory.h"
 
 /* 
  * Create Application data type to begin UI interaction...
