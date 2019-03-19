@@ -9,6 +9,9 @@ OBJECTS = $(DIST_DIR)/main.o\
 	  $(DIST_DIR)/page_entry.o\
 	  $(DIST_DIR)/frame_entry.o\
 	  $(DIST_DIR)/address.o\
+	  $(DIST_DIR)/memory_management_unit.o\
+	  $(DIST_DIR)/page_supervisor.o\
+	  $(DIST_DIR)/page_table.o\
 
 # "-lm" links math.h implementaton to memory.o
 
@@ -52,6 +55,21 @@ $(DIST_DIR)/frame_entry.o: $(LIB_DIR)/frame_entry.c
 # Depends on address.c to be present in order to compile
 $(DIST_DIR)/address.o: $(LIB_DIR)/address.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/address.o
+
+# Target compiles memory_management_unit.c into an object (.o) file
+# Depends on memory_management_unit.c to be present in order to compile
+$(DIST_DIR)/memory_management_unit.o: $(LIB_DIR)/memory_management_unit.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/memory_management_unit.o
+
+# Target compiles page_supervisor.c into an object (.o) file
+# Depends on page_supervisor.c to be present in order to compile
+$(DIST_DIR)/page_supervisor.o: $(LIB_DIR)/page_supervisor.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/page_supervisor.o
+
+# Target compiles page_table.c into an object (.o) file
+# Depends on page_table.c to be present in order to compile
+$(DIST_DIR)/page_table.o: $(LIB_DIR)/page_table.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/page_table.o
 
 # Remove all built files, and re-create the dist directory
 clean:
