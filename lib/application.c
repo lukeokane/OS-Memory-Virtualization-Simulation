@@ -20,12 +20,27 @@ Application new_application() {
  */
 void start(struct Application* app) {
 
+	// Initialize Page Supervisor and MMU instance
+	app->page_supervisor = new_page_supervisor();
+	app->cpu.mmu = new_mmu();
 	app->clear_screen();
+
 	printf("Application started...\nCreating physical memory...\n");
+
 	// Create physical memory sufficient to store...
   // ... all bytes for system address space
 	unsigned char addressSize = 16;
-	app->memory = new_memory(addressSize);
+	// MMU & Page Supervisor have reference to physical memory
+	app->cpu.mmu.memory = new_memory(addressSize);
+	app->page_supervisor.memory = app->cpu.mmu.memory;
+
+	printf("MMU and Page Supervisor now have reference to physical memory.\n");
+
+	// Create page tables via Page Supervisor software, give MMU reference to page tables
+	app->cpu.mmu.page_tables = app->page_supervisor.init_process_page_table(&app->page_supervisor);
+
+	// Populate page tables & write random data to process.
+	
 }
 
 /* 

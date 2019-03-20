@@ -1,16 +1,18 @@
 #ifndef APPLICATION_H
 #define  APPLICATION_H
-#include "memory.h"
+#include "cpu.h"
+#include "page_supervisor.h"
 
 // data type for defining the application
 typedef struct Application {
 
 	// Functions
-	void (*start)(struct Application* app);
+	void (*start)(struct Application *app);
 	void (*clear_screen)();
 	
 	// Member variables
-  Memory memory;
+  CPU cpu;
+	PageSupervisor page_supervisor;
 	
 } Application;
 
@@ -18,7 +20,7 @@ typedef struct Application {
 Application new_application();
 
 // Start application function
-void start(struct Application* app);
+void start(struct Application *app);
 
 // Skip lines on terminal to clear view
 void clear_screen();
