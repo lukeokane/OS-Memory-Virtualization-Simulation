@@ -56,6 +56,11 @@ $(DIST_DIR)/frame_entry.o: $(LIB_DIR)/frame_entry.c
 $(DIST_DIR)/address.o: $(LIB_DIR)/address.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/address.o
 
+# Target compiles cpu.c into an object (.o) file
+# Depends on cpu.c to be present in order to compile
+$(DIST_DIR)/cpu.o: $(LIB_DIR)/cpu.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/cpu.o
+
 # Target compiles memory_management_unit.c into an object (.o) file
 # Depends on memory_management_unit.c to be present in order to compile
 $(DIST_DIR)/memory_management_unit.o: $(LIB_DIR)/memory_management_unit.c

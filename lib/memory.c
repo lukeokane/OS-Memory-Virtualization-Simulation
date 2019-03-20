@@ -26,19 +26,18 @@ Memory new_memory(unsigned char addressSize)
 	is infact taking only 2 bytes in Memory */
 void createPageTablesTest(struct Memory *memory) {
 	PageEntry page_entry;
-	page_entry.address = 2;
+	page_entry.address = 0xDEFF;
 	
 	FrameEntry frame_entry;
-	frame_entry.address = 3;
-	
+	frame_entry.address = 0x0200;
 	
 	memory->allocated[0].page_entry = page_entry;
-	memory->allocated[1].frame_entry = frame_entry;
+	memory->allocated[512].frame_entry = frame_entry;
 	printf("address: %lu\n", sizeof(Address));
 	printf("pageentry: %lu\n", sizeof(PageEntry));
 	printf("frameentry: %lu\n", sizeof(FrameEntry));
 	printf("pageentryfrommemory: %lu\n", sizeof(memory->allocated[0]));
-	printf("frameentryfromemory: %lu\n", sizeof(memory->allocated[1]));
+	printf("frameentryfromemory: %lu\n", sizeof(memory->allocated[512]));
 	printf("pageentryfromemoryvalue: %d\n", memory->allocated[0].page_entry.address);
-	printf("tableentryfromemoryvalue: %d\n", memory->allocated[1].frame_entry.address);
+	printf("frameentryfromemoryvalue: %d\n", memory->allocated[512].frame_entry.address);
 }
