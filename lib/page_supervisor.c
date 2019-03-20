@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h> 
+#include <time.h>
 #include "page_supervisor.h" 
 
 PageSupervisor new_page_supervisor() {
@@ -9,6 +10,11 @@ PageSupervisor new_page_supervisor() {
 
 void populate_random_data(struct PageSupervisor* page_supervisor) {
 
+	unsigned short min_random_bytes = 2048;
+	unsigned short max_random_bytes = 20480;
+
+	srand(time(NULL));
+	unsigned short random_bytes = rand() % (max_random_bytes + 1 - min_random_bytes) + min_random_bytes;
 
 }
 

@@ -40,7 +40,7 @@ void start(struct Application* app) {
 	app->cpu.mmu.page_tables = app->page_supervisor.init_process_page_table(&app->page_supervisor);
 
 	// Populate page tables & write random data to process.
-	
+	app->page_supervisor.populate_random_data(&app->page_supervisor);
 }
 
 /* 
