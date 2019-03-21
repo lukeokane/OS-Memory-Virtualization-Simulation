@@ -36,8 +36,9 @@ void start(struct Application* app) {
 
 	printf("MMU and Page Supervisor now have reference to physical memory.\n");
 
-	// Create page tables via Page Supervisor software, give MMU reference to page tables
-	app->cpu.mmu.page_tables = app->page_supervisor.init_process_page_table(&app->page_supervisor);
+	// Create page tables and manage via Page Supervisor software, give MMU reference to page tables
+	app->cpu.mmu.pti = *app->page_supervisor.init_process_page_table(&app->page_supervisor);
+	printf("Location 1: %p, Location 2: %p\n", &app->cpu.mmu.pti.page_tables[0].end_point, &app->page_supervisor.pti.page_tables[0].end_point);
 
 	// Populate page tables & write random data to process.
 	app->page_supervisor.populate_random_data(&app->page_supervisor);

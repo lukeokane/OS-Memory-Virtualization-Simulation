@@ -5,7 +5,6 @@
 #include <time.h>
 #include "math.h"
 #include "memory.h"
-#include "page_table.h"
 #include "page_tables_info.h"
 
 // Page Supervisor - creates & manages page tables
@@ -14,12 +13,11 @@ typedef struct PageSupervisor {
 
 	// Functions
 	void (*populate_random_data)(struct PageSupervisor* page_supervisor);
-	PageTable* (*init_process_page_table)(struct PageSupervisor* page_supervisor);
+	PageTablesInfo* (*init_process_page_table)(struct PageSupervisor* page_supervisor);
 	
 	/* Member variables */
 
 	// Page table information
-	PageTable* page_tables;
 	PageTablesInfo pti;
 
 	Memory memory;
@@ -33,6 +31,6 @@ PageSupervisor new_page_supervisor();
 // Populate Page Table & write random data to memory
 void populate_random_data(struct PageSupervisor* page_supervisor);
  
-PageTable* init_process_page_table(struct PageSupervisor* page_supervisor);
+PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor);
 
 #endif 

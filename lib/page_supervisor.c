@@ -50,7 +50,7 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
  * @return array of data type PageTable filled with a list of...
  * ... page tables in physical memory
  */
-PageTable* init_process_page_table(struct PageSupervisor* page_supervisor) {
+PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor) {
 
 
 	printf("\nCreating page tables...\n");
@@ -86,7 +86,7 @@ PageTable* init_process_page_table(struct PageSupervisor* page_supervisor) {
 
 	// Page Supervisor creates space in it's own storage...
 	// to store information regarding page tables in physical memory.
-	page_supervisor->page_tables = malloc(page_tables_required * sizeof(PageTable));
+	page_supervisor->pti.page_tables = malloc(page_tables_required * sizeof(PageTable));
 
 	unsigned short i;
 
@@ -96,13 +96,13 @@ PageTable* init_process_page_table(struct PageSupervisor* page_supervisor) {
 		page_table.end_point = ((i + 1) * page_table_size_bytes) - 1;
 
 		// Add page to Page Supervisor
-		page_supervisor->page_tables[i] = page_table;
+		page_supervisor->pti.page_tables[i] = page_table;
 		
-		printf("Page table #%d created, resides in physical memory 0x%X to 0x%X.\n", i + 1, page_supervisor->page_tables[i].start_point, page_supervisor->page_tables[i].end_point);
+		printf("Page table #%d created, resides in physical memory 0x%X to 0x%X.\n", i + 1, page_supervisor->pti.page_tables[i].start_point, page_supervisor->pti.page_tables[i].end_point);
 	}
 
 	// Save number of page tables in page supervisor
 	page_supervisor->pti.page_tables_counter = i;
 
-	return page_supervisor->page_tables;
+	return &page_supervisor->pti;
 }
