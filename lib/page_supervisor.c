@@ -1,6 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h> 
-#include <time.h>
+
 #include "page_supervisor.h" 
 
 PageSupervisor new_page_supervisor() {
@@ -10,25 +8,52 @@ PageSupervisor new_page_supervisor() {
 
 void populate_random_data(struct PageSupervisor* page_supervisor) {
 
+	printf("\nCreating random data...\n");
+
 	unsigned short min_random_bytes = 2048;
 	unsigned short max_random_bytes = 20480;
 
 	srand(time(NULL));
-	unsigned short random_bytes = rand() % (max_random_bytes + 1 - min_random_bytes) + min_random_bytes;
+	unsigned short random_bytes = rand() % (max_random_bytes - min_random_bytes) + min_random_bytes;
+	unsigned short frame_entry_amount = random_bytes / page_supervisor->address_space;
 
+	printf("Pseudorandomly generated number of bytes to write: %d, that totals to %d frame entries.\n", random_bytes, frame_entry_amount);
+	unsigned page_tables_bytes_allocated = page_supervisor->page_table_size_bytes * page_supervisor->page_tables_counter;
+
+	for (unsigned short i = 0; i < random_bytes; i++) {
+		// Write frame entry to pseudorandom memory address that is not used by page tables. 
+		unsigned short random_free_address= rand() % (int) (pow(2, (double) page_supervisor->address_space) - page_tables_bytes_allocated) + page_tables_bytes_allocated;
+
+		// At the minute, this free address could be allocated...
+		// ... but the address could create unusable gaps in memory.
+		// Using modular arithmethic will ensure that creating a new frame...
+		// ... will not cause unusable gaps to occur between frame, since every address will...
+		// ... begin on a bit divisible by the address space.
+		// e.g. every frame will written to the n*16 bit.
+		if (random_free_address % page_supervisor->address_space == 0) {
+			// Get random number or alphabetic character
+			unsigned char random_ascii = rand() % (0x5A - 0x30) + 0x30;
+			
+		}
+		// if modulus is not 0, need reduce i to attempt to get a valid address
+	  else {
+			i--;
+		}
+	}
 }
 
 /*
- * On creating a new process, create enough Page Tables to...
+ * On creating a new process, create enough page tables to...
  * .. address all physical memory
  * @param page_supervisor the Operating System's software...
  * ... to create and manage page tables
- *
+ * @return array of data type PageTable filled with a list of...
+ * ... page tables in physical memory
  */
 PageTable* init_process_page_table(struct PageSupervisor* page_supervisor) {
 
 
-	printf("\nCreating Page Tables...\n");
+	printf("\nCreating page tables...\n");
 
 	// 512 bytes of memory for page table entries (256 PTEs) neccessary to address all physical memory, ...
 	// 2 page tables are required due to spec specifying page table sizes of 256 bytes only.
@@ -38,6 +63,7 @@ PageTable* init_process_page_table(struct PageSupervisor* page_supervisor) {
 	unsigned short page_size_bytes = 2;
 
 	// Store information in page supervisor
+	page_supervisor->address_space = address_space;
 	page_supervisor->page_table_size_bytes = page_table_size_bytes;
 	page_supervisor->page_size_bytes = page_size_bytes;
 
