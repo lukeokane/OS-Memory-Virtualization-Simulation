@@ -6,6 +6,7 @@
 #include "math.h"
 #include "memory.h"
 #include "page_table.h"
+#include "page_tables_info.h"
 
 // Page Supervisor - creates & manages page tables
 // data type for defining page supervisor 
@@ -19,10 +20,7 @@ typedef struct PageSupervisor {
 
 	// Page table information
 	PageTable* page_tables;
-	unsigned short page_tables_counter;
-	unsigned short page_table_size_bytes;
-	unsigned short page_size_bytes;
-	unsigned char address_space;
+	PageTablesInfo pti;
 
 	Memory memory;
 	/* End member variables */
