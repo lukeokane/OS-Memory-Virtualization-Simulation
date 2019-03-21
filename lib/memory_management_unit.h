@@ -1,7 +1,7 @@
 #ifndef MEMORY_MANAGEMENT_UNIT_H 
 #define MEMORY_MANAGEMENT_UNIT_H 
 #include "memory.h"
-#include "page_table.h"
+#include "page_tables_info.h"
 #include "address.h"
  
 // data type for defining page entry 
@@ -12,8 +12,7 @@ typedef struct MemoryManagementUnit {
 
 	// Member variables
   Memory memory;
-
-	PageTable* page_tables;
+	PageTablesInfo pti;
  
 } MemoryManagementUnit;
 

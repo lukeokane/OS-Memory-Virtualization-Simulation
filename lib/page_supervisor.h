@@ -1,8 +1,11 @@
 #ifndef PAGE_SUPERVISOR_H
 #define PAGE_SUPERVISOR_H
+#include <stdlib.h>
+#include <stdio.h> 
+#include <time.h>
 #include "math.h"
 #include "memory.h"
-#include "page_table.h"
+#include "page_tables_info.h"
 
 // Page Supervisor - creates & manages page tables
 // data type for defining page supervisor 
@@ -10,13 +13,15 @@ typedef struct PageSupervisor {
 
 	// Functions
 	void (*populate_random_data)(struct PageSupervisor* page_supervisor);
-	PageTable* (*init_process_page_table)(struct PageSupervisor* page_supervisor);
+	PageTablesInfo* (*init_process_page_table)(struct PageSupervisor* page_supervisor);
 	
-	PageTable* page_tables;
-	unsigned short page_tables_counter;
-	unsigned short page_table_size_bytes;
-	unsigned short page_size_bytes;
+	/* Member variables */
+
+	// Page table information
+	PageTablesInfo pti;
+
 	Memory memory;
+	/* End member variables */
 
 } PageSupervisor;
 
@@ -26,6 +31,6 @@ PageSupervisor new_page_supervisor();
 // Populate Page Table & write random data to memory
 void populate_random_data(struct PageSupervisor* page_supervisor);
  
-PageTable* init_process_page_table(struct PageSupervisor* page_supervisor);
+PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor);
 
 #endif 

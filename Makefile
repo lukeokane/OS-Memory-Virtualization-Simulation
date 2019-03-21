@@ -12,6 +12,7 @@ OBJECTS = $(DIST_DIR)/main.o\
 	  $(DIST_DIR)/memory_management_unit.o\
 	  $(DIST_DIR)/page_supervisor.o\
 	  $(DIST_DIR)/page_table.o\
+	  $(DIST_DIR)/page_tables_info.o\
 
 # "-lm" links math.h implementaton to memory.o
 
@@ -75,6 +76,11 @@ $(DIST_DIR)/page_supervisor.o: $(LIB_DIR)/page_supervisor.c
 # Depends on page_table.c to be present in order to compile
 $(DIST_DIR)/page_table.o: $(LIB_DIR)/page_table.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/page_table.o
+
+# Target compiles page_tables_info.c into an object (.o) file
+# Depends on page_tables_info.c to be present in order to compile
+$(DIST_DIR)/page_tables_info.o: $(LIB_DIR)/page_tables_info.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/page_tables_info.o
 
 # Remove all built files, and re-create the dist directory
 clean:

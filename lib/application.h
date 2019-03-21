@@ -11,7 +11,7 @@ typedef struct Application {
 	void (*clear_screen)();
 	
 	// Member variables
-  CPU cpu;
+	CPU cpu;
 	PageSupervisor page_supervisor;
 	
 } Application;
