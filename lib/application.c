@@ -9,7 +9,7 @@
  */
 Application new_application() {
 
-	Application application = { start, clear_screen };
+	Application application = { start, clear_screen, write_txt_files };
 	return application;
 }
 
@@ -41,6 +41,8 @@ void start(struct Application* app) {
 
 	// Populate page tables & write random data to process.
 	app->page_supervisor.populate_random_data(&app->page_supervisor);
+
+	app->write_txt_files(&app->cpu.mmu);
 }
 
 /* 
@@ -52,4 +54,20 @@ void clear_screen() {
 	printf("\n\n\n\n\n\n\n\n\n\n");
 }
 
+/* 
+ * Skip 10 lines to clear screen space for new action
+ * @return void
+ *
+ */
+void write_txt_files(struct MemoryManagementUnit *mmu) {
+	FILE *ptf = fopen("./data/page_table.txt", "w+");
+	FILE *pmf = fopen("./data/physical_memory.txt", "w+");
+	fprintf(ptf, "Page    | Page Table Entry\n");
+	fprintf(pmf, "Address | Frame | Content\n");
 
+	// Close text files
+	fclose(ptf);
+	fclose(pmf);
+
+   
+}

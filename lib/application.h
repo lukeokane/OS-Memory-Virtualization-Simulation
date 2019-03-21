@@ -9,6 +9,7 @@ typedef struct Application {
 	// Functions
 	void (*start)(struct Application *app);
 	void (*clear_screen)();
+	void (*write_txt_files)(struct MemoryManagementUnit *mmu);
 	
 	// Member variables
 	CPU cpu;
@@ -24,5 +25,8 @@ void start(struct Application *app);
 
 // Skip lines on terminal to clear view
 void clear_screen();
+
+// Write out physical memory and page tables
+void write_txt_files(struct MemoryManagementUnit *mmu);
 
 #endif
