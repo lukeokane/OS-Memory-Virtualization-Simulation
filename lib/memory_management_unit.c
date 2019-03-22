@@ -59,7 +59,7 @@ FrameEntry translate_virtual_address(MemoryManagementUnit *mmu, unsigned short v
 		FrameEntry frame_entry = mmu->memory.allocated[FN + offset].frame_entry;
 
 		// Print char if char, otherwise it has no data written to it so just print the value
-		if (frame_entry.address != 0) {
+		if (frame_entry.address > 0) {
 			printf("Retrieved frame, data in the frame is: '%c'\n", frame_entry.address);
 		} else { 
 			printf("Retrieved frame, data in the frame is: '%04d'\n", frame_entry.address);
