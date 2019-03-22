@@ -12,6 +12,7 @@ typedef struct Application {
 	void (*write_txt_files)(struct Application *app);
 	void (*write_physical_memory)(struct MemoryManagementUnit *mmu);
 	void (*write_page_table)(struct MemoryManagementUnit *mmu);
+	unsigned short (*user_prompt)();
 	
 	// Member variables
 	CPU cpu;
@@ -36,5 +37,7 @@ void write_physical_memory(struct MemoryManagementUnit *mmu);
 
 // Write out page tables in physical memory
 void write_page_table(struct MemoryManagementUnit *mmu);
+
+unsigned short user_prompt();
 
 #endif

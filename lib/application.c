@@ -10,7 +10,8 @@
 Application new_application() {
 
 	Application application = { start, clear_screen, write_txt_files,
-															write_physical_memory, write_page_table };
+															write_physical_memory, write_page_table,
+															user_prompt };
 	return application;
 }
 
@@ -43,10 +44,14 @@ void start(struct Application* app) {
 	// Populate page tables & write random data to process.
 	app->page_supervisor.populate_random_data(&app->page_supervisor);
 
-	// Write populated to .txt files
+	// Write populated data to .txt files
 	app->write_txt_files(app);
 
-	app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, 0x1);
+	// Display prompt to enter virtual address until exit (CTRL+C)
+	do {
+	unsigned char virtual_address = app->user_prompt();
+	app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, virtual_address);
+	} while (1 == 1);
 }
 
 /* 
@@ -133,4 +138,14 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 	// Close stream
 	fclose(ptf);
 
+}
+
+unsigned short user_prompt() {
+	printf("\n\nPress CTRL+C to quit.\n");
+	printf("Enter a virtual address in hexadecimal format (e.g. A3AF2): ");
+
+	unsigned short virtual_address;
+	scanf("%hX", &virtual_address);
+  
+	return virtual_address;
 }
