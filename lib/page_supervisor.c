@@ -30,9 +30,9 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 	// Generate random no. of bytes between 2048 and 20480
 	unsigned short random_bytes = rand() % (max_random_bytes - min_random_bytes) + min_random_bytes;
 	// Get number of frame entries possible with the random bytes
-	unsigned short frame_entry_amount = random_bytes / page_supervisor->pti.address_space;
+	unsigned short frame_entry_amount = random_bytes / sizeof(unsigned char);
 
-	printf("Pseudorandomly generated number of bytes to write: %d, that totals to %d frame entries.\n", random_bytes, frame_entry_amount);
+	printf("Pseudorandomly generated number of bytes to write: %d", random_bytes, frame_entry_amount);
 	printf("Beginning writing of pseudorandom data to pseudorandom memory locations...\n");
 
 	unsigned short page_tables_bytes_allocated = page_supervisor->pti.page_table_size_bytes * page_supervisor->pti.page_tables_counter;

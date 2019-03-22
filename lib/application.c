@@ -47,9 +47,11 @@ void start(struct Application* app) {
 	// Write populated data to .txt files
 	app->write_txt_files(app);
 
+	//app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, 0x0100);
+
 	// Display prompt to enter virtual address until exit (CTRL+C)
 	do {
-	unsigned char virtual_address = app->user_prompt();
+	unsigned short virtual_address = app->user_prompt();
 	app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, virtual_address);
 	} while (1 == 1);
 }
@@ -83,9 +85,27 @@ void write_physical_memory(struct MemoryManagementUnit *mmu) {
 	
 	FILE *pmf = fopen("./data/physical_memory.txt", "w+");
 	
-	//fprintf(pmf, "  Address  | Frame | Offset | Content |\n");
-	//fprintf(pmf, "  0x%04X   |  %d   |   %d   |    %c   |\n");
+	fprintf(pmf, "NOTE: While the addresses printed are correct, there is an issue with memory from another variable overlapping the physical memory array.\n");
+	fprintf(pmf, "So junk data will appear in areas, did not have time to fix the issue.\n");
+
+	fprintf(pmf, "  Address   | Frame Number | Offset |   Content   |\n"); 
+	fprintf(pmf, "--------------------------------------------------|\n");
 	
+	unsigned short page_tables_size_bytes = mmu->pti.page_table_size_bytes * mmu->pti.page_tables_counter;
+	int bytes = pow(2, mmu->pti.address_space);
+	for (unsigned int i = page_tables_size_bytes; i < bytes; i++) {
+		FrameEntry fe = mmu->memory.allocated[i].frame_entry;
+	
+		unsigned short FN = i & (unsigned short) 0xFF00;
+		unsigned short offset = i & (unsigned short) 0x00FF;
+		char null_text[] = "null";
+		if (fe.address != 0x0) {
+			fprintf(pmf, "   0x%04X   |    %4d      |  %3d   | %4c  (%d)  |\n", i, FN, offset, fe.address, fe.address);
+		}
+		else {
+			fprintf(pmf, "   0x%04X   |    %4d      |  %3d   |   %s (%d)  |\n", i, FN, offset, null_text, fe.address);
+		}
+	}
 	fclose(pmf);
 }
 

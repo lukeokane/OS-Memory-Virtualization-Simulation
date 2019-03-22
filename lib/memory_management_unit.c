@@ -52,19 +52,21 @@ FrameEntry translate_virtual_address(MemoryManagementUnit *mmu, unsigned short v
 
 	if (present_bit == 1) {
 
-	printf("Valid page entry, frame is present in memory.\n");
+		printf("Valid page entry, frame is present in memory.\n");
 	
-	unsigned short FN = page_entry.address & (unsigned short) 0xFF00;
+		unsigned short FN = page_entry.address & (unsigned short) 0xFF00;
 
-	printf("Retreiving frame from frame number %d at offset %d...\n", FN / mmu->pti.page_table_size_bytes, offset);
+		printf("Retreiving frame from frame number %d at offset %d...\n", FN / mmu->pti.page_table_size_bytes, offset);
 
-	// Get frame entry, multiply offset by page size bytes since all frame entries are 2 bytes
-	FrameEntry frame_entry = mmu->memory.allocated[FN + (offset * mmu->pti.page_size_bytes)].frame_entry;
+		// Get frame entry, multiply offset by page size bytes since all frame entries are 2 bytes
+		FrameEntry frame_entry = mmu->memory.allocated[FN + offset].frame_entry;
 
-	printf("Retrieved frame, data in the frame is: '%04X'\n", frame_entry.address);
-	
-	} else { 
-
+		// Print char if char, otherwise it has no data written to it so just print the value
+		if (frame_entry.address != 0) {
+			printf("Retrieved frame, data in the frame is: '%c'\n", frame_entry.address);
+		} else { 
+			printf("Retrieved frame, data in the frame is: '%04d'\n", frame_entry.address);
+		}
 	}
 
 	
