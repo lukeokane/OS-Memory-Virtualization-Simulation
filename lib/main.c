@@ -1,10 +1,12 @@
 #include "./application.h"
+#include "./memory.h"
+#include "./page_entry.h"
  
 int main() {
  
-	Application application = new_application();
+	Application app = new_application();
 	// Start application
-	application.start();
+	app.start(&app);
 
 	return 0;
 }
