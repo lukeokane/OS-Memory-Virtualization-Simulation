@@ -9,7 +9,8 @@
  */
 Application new_application() {
 
-	Application application = { start, clear_screen, write_txt_files };
+	Application application = { start, clear_screen, write_txt_files,
+															write_physical_memory, write_page_table };
 	return application;
 }
 
@@ -42,7 +43,10 @@ void start(struct Application* app) {
 	// Populate page tables & write random data to process.
 	app->page_supervisor.populate_random_data(&app->page_supervisor);
 
-	app->write_txt_files(&app->cpu.mmu);
+	// Write populated to .txt files
+	app->write_txt_files(app);
+
+	app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, 0x1);
 }
 
 /* 
@@ -55,12 +59,37 @@ void clear_screen() {
 }
 
 /* 
- * Skip 10 lines to clear screen space for new action
+ * Write out physical memory contents and physical memory's page table's...
+ * contents to 2 txt files
  * @return void
  *
  */
-void write_txt_files(struct MemoryManagementUnit *mmu) {
+void write_txt_files(struct Application *app) {
+  app->write_physical_memory(&app->cpu.mmu);
+	app->write_page_table(&app->cpu.mmu);
+}
+
+/* 
+ * Write out physical memory contents
+ * @return void
+ *
+ */
+void write_physical_memory(struct MemoryManagementUnit *mmu) {
+	
 	FILE *pmf = fopen("./data/physical_memory.txt", "w+");
+	
+	//fprintf(pmf, "  Address  | Frame | Offset | Content |\n");
+	//fprintf(pmf, "  0x%04X   |  %d   |   %d   |    %c   |\n");
+	
+	fclose(pmf);
+}
+
+/* 
+ * Write out physical memory's page table's
+ * @return void
+ *
+ */
+void write_page_table(struct MemoryManagementUnit *mmu) {
 
 	FILE *ptf = fopen("./data/page_table.txt", "w+");
 	// Legend
@@ -101,9 +130,7 @@ void write_txt_files(struct MemoryManagementUnit *mmu) {
 
 	}
 
-	// Close text files
+	// Close stream
 	fclose(ptf);
-	fclose(pmf);
 
-   
 }
