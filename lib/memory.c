@@ -17,7 +17,7 @@ Memory new_memory(unsigned char addressSize)
 	// addressSize can address 2^addressSize bytes of memory
 	// so allocate 2^addressSize
 	double bytes = pow(2, (double) addressSize);
-	printf("Physical memory allocated with 2^%0d (%.0lf) bytes.\n", addressSize, bytes);
+	printf("Memory allocated with 2^%0d (%.0lf) bytes.\n", addressSize, bytes);
   	memory.allocated = malloc(pow(2, (double) addressSize));
 
   return memory;

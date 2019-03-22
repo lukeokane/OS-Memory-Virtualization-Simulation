@@ -6,6 +6,7 @@
 #include "math.h"
 #include "memory.h"
 #include "page_tables_info.h"
+#include "external_disk.h"
 
 // Page Supervisor - creates & manages page tables
 // data type for defining page supervisor 
@@ -14,13 +15,14 @@ typedef struct PageSupervisor {
 	// Functions
 	void (*populate_random_data)(struct PageSupervisor* page_supervisor);
 	PageTablesInfo* (*init_process_page_table)(struct PageSupervisor* page_supervisor);
+	void (*page_to_external)(struct PageSupervisor* page_supervisor, unsigned short page_num);
 	
 	/* Member variables */
 
 	// Page table information
 	PageTablesInfo pti;
-
 	Memory memory;
+	ExternalDisk ssd;
 	/* End member variables */
 
 } PageSupervisor;
@@ -32,5 +34,7 @@ PageSupervisor new_page_supervisor();
 void populate_random_data(struct PageSupervisor* page_supervisor);
  
 PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor);
+
+void page_to_external(struct PageSupervisor* page_supervisor, unsigned short page_num);
 
 #endif 

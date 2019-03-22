@@ -1,6 +1,7 @@
 #ifndef APPLICATION_H
 #define  APPLICATION_H
 #include "cpu.h"
+#include "memory.h"
 #include "page_supervisor.h"
 
 // data type for defining the application
@@ -16,6 +17,7 @@ typedef struct Application {
 	
 	// Member variables
 	CPU cpu;
+	Memory memory;
 	PageSupervisor page_supervisor;
 	
 } Application;
