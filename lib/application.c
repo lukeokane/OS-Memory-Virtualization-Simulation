@@ -104,7 +104,7 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 	unsigned short total_page_entries = mmu->pti.page_tables_counter * entries_per_table;
 
 	unsigned short i;
-	for (i = 0; i < total_page_entries; i++) {
+	for (i = 0; i < total_page_entries; i += 2) {
 	// Extract all data from page entry
 	PageEntry page_entry = mmu->memory.allocated[i].page_entry;
 
