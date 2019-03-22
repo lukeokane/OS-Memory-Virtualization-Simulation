@@ -58,7 +58,8 @@ FrameEntry translate_virtual_address(MemoryManagementUnit *mmu, unsigned short v
 
 	printf("Retreiving frame from frame number %d at offset %d...\n", FN / mmu->pti.page_table_size_bytes, offset);
 
-	FrameEntry frame_entry = mmu->memory.allocated[FN + offset].frame_entry;
+	// Get frame entry, multiply offset by page size bytes since all frame entries are 2 bytes
+	FrameEntry frame_entry = mmu->memory.allocated[FN + (offset * mmu->pti.page_size_bytes)].frame_entry;
 
 	printf("Retrieved frame, data in the frame is: '%04X'\n", frame_entry.address);
 	

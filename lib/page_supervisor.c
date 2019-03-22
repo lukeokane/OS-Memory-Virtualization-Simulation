@@ -1,11 +1,23 @@
 
 #include "page_supervisor.h" 
 
+/* 
+ * Create PageSupervisor data type to create and manage...
+ * ... page tables.
+ * @return PageSupervisor data type with instantiated functions
+ *
+ */
 PageSupervisor new_page_supervisor() {
 	PageSupervisor page_supervisor = { populate_random_data, init_process_page_table };
 	return page_supervisor;
 }
 
+/*
+ * Create page table entries and random frame entries.
+ * @param page_supervisor the Operating System's software...
+ * ... to create and manage page tables
+ * @return avoid
+ */
 void populate_random_data(struct PageSupervisor* page_supervisor) {
 
 	printf("\nCreating random data...\n");
@@ -25,6 +37,32 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 
 	unsigned short page_tables_bytes_allocated = page_supervisor->pti.page_table_size_bytes * page_supervisor->pti.page_tables_counter;
 	
+	// Get total amount of page table entries
+	unsigned short page_tables_entries_amount = page_tables_bytes_allocated / page_supervisor->pti.page_size_bytes;
+
+	// Create page tables
+	for (unsigned short i = 0; i < page_tables_bytes_allocated; i += 2) {
+		
+		// Linear frame number and apply offset from amount of memory taken by page tables 
+		unsigned short frame_number = (i * page_supervisor->pti.page_table_size_bytes) + page_tables_bytes_allocated;
+		
+		PageEntry page_entry;
+		page_entry.address = frame_number;
+
+		// Set entry's 'present' bit to 1/true.
+		// This is bit 0 in this page entry architecture
+		page_entry.address |= (unsigned short) 1;
+		// Set entry's 'read/write' bit to 1/write
+		// page_entry.address 	   : 1111 1111 0000 0001
+		// (unsigned short) 1 << 1 : 0000 0000 0000 0010
+		// 			     -------------------
+		// OR			   : 1111 1111 0000 0011
+		page_entry.address |= (unsigned short) 1 << 1;
+
+		// Add page entry to memory
+		printf("Page entry in memory place: %d\n", i);
+		page_supervisor->memory.allocated[i].page_entry = page_entry;
+	}
 	for (unsigned short i = 0; i < frame_entry_amount; i++) {
 		// Write frame entry to pseudorandom memory address that is not used by page tables. 
 		unsigned short random_free_address = rand() % (int) (pow(2, (double) page_supervisor->pti.address_space) - page_tables_bytes_allocated) + page_tables_bytes_allocated;
@@ -35,8 +73,9 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 		// ... will not cause unusable gaps to occur between frame, since every address will...
 		// ... begin on a bit divisible by the address space.
 		// e.g. every frame will written to the n*16 bit.
-		if (random_free_address % page_supervisor->pti.address_space == 0) {
-
+		if (random_free_address % page_supervisor->pti.page_size_bytes == 0) {
+	
+			//printf("random free address % 16: %d", random_free_address);
 			// e.g if the address is byte no. 12345 (0x3039)
 			// to get frame number, lose first 8 bits by using a mask
 			// address: 			0x3039 (12345 bytes)
@@ -44,24 +83,6 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 			// frame number:	0x3000 (12288 bytes)
 			unsigned short frame_mask = 0xFF00;
 			unsigned short frame_number = random_free_address & frame_mask;
-
-			// Create page entry
-			PageEntry page_entry;
-			page_entry.address = frame_number;
-
-			// Set entry's 'present' bit to 1/true.
-			// This is bit 0 in this page entry architecture
-			page_entry.address |= (unsigned short) 1;
-
-			// Set entry's 'read/write' bit to 1/write
-			// page_entry.address 		 : 1111 1111 0000 0001
-			// (unsigned short) 1 << 1 : 0000 0000 0000 0010
-			// 													 -------------------
-			// OR											 : 1111 1111 0000 0011
-			page_entry.address |= (unsigned short) 1 << 1;
-
-			// Add page entry to memory
-			page_supervisor->memory.allocated[i].page_entry = page_entry;
 
 			// Get current page table entry offset to corresponding frame entry offset 
 			unsigned short frame_offset = i % page_supervisor->pti.page_table_size_bytes; 
@@ -74,7 +95,10 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 			frame_entry.address = random_ascii; 
  
 			// Write frame entry to memory 
-			page_supervisor->memory.allocated[frame_entry_address].frame_entry = frame_entry;
+			page_supervisor->memory.allocated[random_free_address].frame_entry = frame_entry;
+			if (frame_entry.address >= 90) {
+			printf("char %c (%d) is now in %d\n", frame_entry.address, frame_entry.address, random_free_address);
+			}
 		}
 		// if modulus is not 0, need reduce i to attempt to get a valid address
 	  else {
