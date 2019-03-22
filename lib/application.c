@@ -100,10 +100,10 @@ void write_physical_memory(struct MemoryManagementUnit *mmu) {
 		unsigned short offset = i & (unsigned short) 0x00FF;
 		char null_text[] = "null";
 		if (fe.address != 0x0) {
-			fprintf(pmf, "   0x%04X   |    %4d      |  %3d   | %4c  (%d)  |\n", i, FN, offset, fe.address, fe.address);
+			fprintf(pmf, "   0x%04X   |     %4d     |  %3d   | %4c  (%d)  |\n", i, FN, offset, fe.address, fe.address);
 		}
 		else {
-			fprintf(pmf, "   0x%04X   |    %4d      |  %3d   |   %s (%d)  |\n", i, FN, offset, null_text, fe.address);
+			fprintf(pmf, "   0x%04X   |     %4d     |  %3d   |   %s (%d)  |\n", i, FN, offset, null_text, fe.address);
 		}
 	}
 	fclose(pmf);

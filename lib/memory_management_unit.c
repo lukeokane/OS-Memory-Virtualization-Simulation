@@ -24,13 +24,10 @@ FrameEntry translate_virtual_address(MemoryManagementUnit *mmu, unsigned short v
 	// Mask to get 8 lowest bits
 	unsigned short offset_mask = 0x00FF;
 
-	unsigned short address = virtual_address;
 
 	unsigned short offset = virtual_address & offset_mask;
 
 	unsigned short vpn = virtual_address >> 8;
-	
-	unsigned short index = (vpn * mmu->pti.page_table_size_bytes) + offset;
 
 	printf("Searching page entry in page %d, offset %d.\n", vpn, offset);
 
