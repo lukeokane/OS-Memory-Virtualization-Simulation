@@ -3,14 +3,14 @@
 
 void page_entry_legend() {
 		// Legend
-	printf("\n\nPAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\nPCD  - Page-level cache disable\n");
-	printf("PWT  - Page-level write-through\nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
+	printf("\n\nPAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\nNU - Not Used\n");
+	printf("NU - Not Used\nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
 }
 
 void page_entry_header() {
 
 	printf("                    Page Table Entry                 \n");
-	printf("    FN    | *NU* | D | A | PCD | PWT | U/S | R/W | P |\n");
+	printf("    FN    | *NU* | D | A | *NU* | *NU* | U/S | R/W | P |\n");
 	printf("------------------------------------------------------\n");
 }
 
@@ -26,5 +26,5 @@ void print_page_entry(PageEntry page_entry) {
 	unsigned char RorW = (page_entry.address >> 1) & 1;
 	unsigned char P = (page_entry.address >> 0) & 1;
 
-	printf("  0x%04X  |   %d  | %d | %d |  %d  |  %d  |  %d  |  %d  | %d |\n", FN, NU, D, A, PCD, PWT, UorS, RorW, P);
+	printf("  0x%04X  |   %d  | %d | %d |   %d  |   %d  |  %d  |  %d  | %d |\n", FN, NU, D, A, PCD, PWT, UorS, RorW, P);
 }

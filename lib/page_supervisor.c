@@ -103,7 +103,7 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 	
 	// Add two pages to external memory
 	page_supervisor->page_to_external(page_supervisor, 2 * page_supervisor->pti.page_table_size_bytes);
-		page_supervisor->page_to_external(page_supervisor, 13 * page_supervisor->pti.page_table_size_bytes);
+	page_supervisor->page_to_external(page_supervisor, 13 * page_supervisor->pti.page_table_size_bytes);
 
 	PageEntry page13 = page_supervisor->memory.allocated[13 * page_supervisor->pti.page_size_bytes].page_entry;
 	page13.address &= ~( (unsigned short) 1 << 0);
