@@ -62,7 +62,19 @@ void start(struct Application* app) {
 	// Display prompt to enter virtual address until exit (CTRL+C)
 	do {
 	unsigned short virtual_address = app->user_prompt();
-	app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, virtual_address);
+	signed char result = app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, virtual_address);
+
+	if (result == -1){
+		printf("--PAGE FAULT THROWN BY CPU--\n");
+		printf("--EXCEPTION CAUGHT BY OS EXCEPTION HANDLING SOFTWARE (Page Supervisor)---\n");
+	 	signed char result = app->page_supervisor.page_to_memory(&app->page_supervisor, virtual_address);
+		// PT entry now in memory if return result is 0, so retry translation
+		if (result == 0) {
+		printf("\n\nPage Supervisor returns a value to the CPU to restart translation\n");
+		app->cpu.mmu.translate_virtual_address(&app->cpu.mmu, virtual_address);
+		}
+	}
+	app->write_txt_files(app);
 	} while (1 == 1);
 }
 
@@ -174,7 +186,6 @@ void write_external_disk(struct PageSupervisor *page_supervisor) {
 	fprintf(edf, "  Ext. Disk Addr.  | Content  |\n"); 
 	fprintf(edf, "------------------------------|\n");
 
-	printf("SIZE: %d\n", page_supervisor->ssd.size);
 	for (unsigned int i = 0; i < page_supervisor->ssd.size; i++) {
 		FrameEntry fe = page_supervisor->ssd.memory.allocated[i].frame_entry;
 
@@ -190,11 +201,18 @@ void write_external_disk(struct PageSupervisor *page_supervisor) {
 }
 
 unsigned short user_prompt() {
-	printf("\n\nPress CTRL+C to quit.\n");
+	printf("\n\n---------------------------------- USER INPUT ---------------------------------------------\n");
+	printf("-------------------------------------------------------------------------------------------\n");
+	printf("NOTE: 2 page entries (page 2 and 13) are not in memory, their virtual memory addresses are:\n");
+	printf("Page 2: 0x0200 to 0x02FF\n");
+	printf("Page 13: 0x0D00 to 0x0DFF\n\n");
+	printf("On every translation, all .txt files are updated with their up to data values.\n\n");
+	printf("\n\nPress CTRL+C to quit.\n"); 
 	printf("Enter a virtual address in hexadecimal format (e.g. A3AF2): ");
 
 	unsigned short virtual_address;
 	scanf("%hX", &virtual_address);
+	printf("-----------------------------------------------------------------\n\n");
   
 	return virtual_address;
 }

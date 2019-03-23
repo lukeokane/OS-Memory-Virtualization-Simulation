@@ -178,7 +178,7 @@ PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor) 
 	return &page_supervisor->pti;
 }
 
-void page_to_external(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
+signed char page_to_external(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
 	
 	// Get page number
 	unsigned short page_num = (virtual_address & (unsigned short) 0xFF00) / page_supervisor->pti.page_table_size_bytes;
@@ -186,6 +186,7 @@ void page_to_external(struct PageSupervisor* page_supervisor, unsigned short vir
 	// Get page entry's frame number
 	PageEntry page = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;	
 	unsigned short frame_number = page.address & (unsigned short) 0xFF00;
+	printf("Page Supervisor has found PT entry to page out at page at location 0x%04X.\n", page_num * page_supervisor->pti.page_size_bytes);
 
 	// Write all frames to external disk
 	for (unsigned short i = 0; i < page_supervisor->pti.page_table_size_bytes; i++) {
@@ -201,9 +202,11 @@ void page_to_external(struct PageSupervisor* page_supervisor, unsigned short vir
 	printf("Page %d moved from physical memory to external disk.\n", page_num);
 	unsigned short last_frame_entry_no = (frame_number + page_supervisor->pti.page_table_size_bytes) - 1;
 	printf("(Frame entries 0x%04X to 0x%04X have been wiped from physical memory)\n", frame_number, last_frame_entry_no);
+
+	return 0;
 }
 
-void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
+signed char page_to_memory(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
 
 	// Get page number
 	unsigned short page_num = (virtual_address & (unsigned short) 0xFF00) / page_supervisor->pti.page_table_size_bytes;
@@ -230,4 +233,7 @@ void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short virtu
 	PageEntry pe = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;
 	pe.address |= (unsigned short) 1;
 	page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry = pe;
+	printf("PT Entry has been updated, 'present' bit set to 1.");
+
+	return 0;
 }

@@ -20,29 +20,26 @@ MemoryManagementUnit new_mmu() {
  */
 signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short virtual_address) {
 
-	printf("\nTranslating virtual address '0x%08x'...\n", virtual_address);
+	printf("\nTranslating virtual address '0x%04x'...\n", virtual_address);
 	// Mask to get 8 lowest bits
 	unsigned short offset_mask = 0x00FF;
-
 
 	unsigned short offset = virtual_address & offset_mask;
 
 	unsigned short vpn = virtual_address >> 8;
+
+	//printf("Address 0x%X = VPN: 0x%X maps to address 0x%X, offset: 0x%X\n", virtual_address, vpn, vpn * mmu->pti.page_size_bytes, offset);
 
 	printf("Searching page entry in page %d, offset %d.\n", vpn, offset);
 
 	// Get page entry
 	PageEntry page_entry = mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry;
 
-
 	// Print page entry
 	printf("\n");	
 	page_entry_header();
 	print_page_entry(page_entry);
 	printf("\n");
-		
-
-	printf("Address 0x%X = VPN: 0x%X maps to address 0x%X, offset: 0x%X\n", virtual_address, vpn, vpn * mmu->pti.page_size_bytes, offset);
 
 	char present_bit = (page_entry.address >> 0) & 1;
 
@@ -70,9 +67,6 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 	} else {
 		return -1;
 	}
-
-	
-	
 	
 	// TODO: READ PAGE ENTRIES AFTER DOING POPULATING DATA
 	// TODO: CHECKING IF PAGE IS VALID BUT NEEDS TO THROW PAGE FAULT
