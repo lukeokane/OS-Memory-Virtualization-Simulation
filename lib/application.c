@@ -171,8 +171,8 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 void write_external_disk(struct PageSupervisor *page_supervisor) {
 	FILE *edf = fopen("./data/external_disk.txt", "w+");
 	
-	fprintf(edf, "  Ext. Disk Addr.  | Content |\n"); 
-	fprintf(edf, "-----------------------------|\n");
+	fprintf(edf, "  Ext. Disk Addr.  | Content  |\n"); 
+	fprintf(edf, "------------------------------|\n");
 
 	printf("SIZE: %d\n", page_supervisor->ssd.size);
 	for (unsigned int i = 0; i < page_supervisor->ssd.size; i++) {
@@ -180,10 +180,10 @@ void write_external_disk(struct PageSupervisor *page_supervisor) {
 
 		char null_text[] = "null";
 		if (fe.address != 0x0) {
-			fprintf(edf, "   0x%04X   | %4c  (%d)  |\n", i, fe.address, fe.address);
+			fprintf(edf, "       0x%04X      |%4c (%d) |\n", i, fe.address, fe.address);
 		}
 		else {
-			fprintf(edf, "   0x%04X   |   %s (%d)  |\n", i, null_text, fe.address);
+			fprintf(edf, "       0x%04X      | %s (%d) |\n", i, null_text, fe.address);
 		}
 	}
 	fclose(edf);
