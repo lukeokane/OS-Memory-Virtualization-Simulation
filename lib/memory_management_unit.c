@@ -32,7 +32,7 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 
 	printf("Searching translate lookaside buffer for page entry...\n"); 
 	// Search in TLB for entry 
-	PageEntry* page_entry_tlb = mmu->tlb_search(&mmu->tlb, vpn); 
+	PageEntry* page_entry_tlb = mmu->tlb_search(&mmu->tlb, vpn * mmu->pti.page_size_bytes); 
 	
 	PageEntry page_entry;
 
@@ -76,7 +76,7 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 		}
 
 		// Add to TLB cache
-		mmu->tlb_add_entry(&mmu->tlb, page_entry, vpn);
+		mmu->tlb_add_entry(&mmu->tlb, page_entry, vpn * mmu->pti.page_size_bytes);
 		
 	} else {
 		return -1;
