@@ -32,8 +32,10 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 
 	printf("Searching page entry in page %d, offset %d.\n", vpn, offset);
 
-	// Get page entry
+	// Get page entry, set "Accessed" bit to 1;
 	PageEntry page_entry = mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry;
+	page_entry.address |= (unsigned short) 1 << 5;
+	mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry = page_entry;
 
 	// Print page entry
 	printf("\n");	
