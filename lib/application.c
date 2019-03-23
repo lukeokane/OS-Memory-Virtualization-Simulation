@@ -29,14 +29,21 @@ void start(struct Application* app) {
 	// Initialize External Disk, Page Supervisor and MMU instance
 	// Cannot use malloc() in a function to create an instance of a data type, ...
 	// causes MAJOR	problem with different variables pointing to same address
-	unsigned char address_size = 16;
 	app->page_supervisor = new_page_supervisor();
+
+	unsigned char address_size = 16;
 	app->memory.allocated = malloc(pow(2, (double) address_size));
+
 	app->cpu.mmu = new_mmu();
+
 	unsigned char external_address_size = 16;
 	app->ssd.size = pow(2, external_address_size);
 	app->ssd.memory.allocated = malloc(pow(2, external_address_size));
+
 	app->tlb.entries = malloc(16 * sizeof(TLBEntry));
+	app->cpu.mmu.tlb.entries = app->tlb.entries;
+	app->cpu.mmu.tlb.max_entries = 16;
+	app->cpu.mmu.tlb.total_entries = 0;
 
 	// Give reference to external disk to page supervisor
 	app->page_supervisor.ssd = app->ssd;
@@ -214,6 +221,36 @@ void write_external_disk(struct PageSupervisor *page_supervisor) {
 }
 
 void write_tlb(struct TLB *tlb) {
+	FILE *tf = fopen("./data/tlb.txt", "w+");
+
+	// Legend
+	fprintf(tf, "PAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\n*NU* - Not Used\n");
+	fprintf(tf, "*NU* - Not Used \nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
+	// Table layout
+	fprintf(tf, "  Page No  |                    Page Table Entry                   |\n");
+	fprintf(tf, "           |    FN    | *NU* | D | A | *NU* | *NU* | U/S | R/W | P |\n");
+	fprintf(tf, "--------------------------------------------------------------------\n");
+
+	
+	for (unsigned short i = 0; i < 16; i++) {
+
+	unsigned char virtual_page = tlb->entries[i].virt_page;
+	PageEntry page_entry = tlb->entries[i].pe;
+
+	unsigned short FN = page_entry.address & (unsigned short) 0xFF00;
+	unsigned char NU1 = (page_entry.address >> 7) & 1;
+	unsigned char D = (page_entry.address >> 6) & 1;
+	unsigned char A = (page_entry.address >> 5) & 1;
+	unsigned char NU2 = (page_entry.address >> 4) & 1;
+	unsigned char NU3 = (page_entry.address >> 3) & 1;
+	unsigned char UorS = (page_entry.address >> 2) & 1;
+	unsigned char RorW = (page_entry.address >> 1) & 1;
+	unsigned char P = (page_entry.address >> 0) & 1;
+	
+	fprintf(tf, "   0x%04X  |  0x%04X  |   %d  | %d | %d |   %d  |   %d  |  %d  |  %d  | %d |\n", virtual_page, FN, NU1, D, A, NU2, NU3, UorS, RorW, P);
+	}
+
+	fclose(tf);
 }
 
 unsigned short user_prompt() {

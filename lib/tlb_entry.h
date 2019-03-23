@@ -6,8 +6,8 @@
 typedef struct TLBEntry { 
 
 	// Member variables
-	PageEntry pe;
 	unsigned char virt_page;
+	PageEntry pe;
 
 } TLBEntry;
 

@@ -7,6 +7,8 @@ typedef struct TLB {
 
 	// Member variables
 	TLBEntry* entries;
+	unsigned char total_entries;
+	unsigned char max_entries;
 
 } TLB;
 

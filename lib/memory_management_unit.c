@@ -8,7 +8,7 @@
  */
 MemoryManagementUnit new_mmu() {
 
-	MemoryManagementUnit mmu = { translate_virtual_address };
+	MemoryManagementUnit mmu = { translate_virtual_address, tlb_search, tlb_add_entry };
 	return mmu;
 }
 
@@ -30,10 +30,19 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 
 	//printf("Address 0x%X = VPN: 0x%X maps to address 0x%X, offset: 0x%X\n", virtual_address, vpn, vpn * mmu->pti.page_size_bytes, offset);
 
+	// Search in TLB for entry
+	PageEntry* page_entry_tlb = mmu->tlb_search(&mmu->tlb, virtual_address);
+	
+	PageEntry page_entry;
+
+	if (page_entry_tlb != NULL)
+	{
+		page_entry.address = page_entry_tlb->address;
+	}
 	printf("Searching page entry in page %d, offset %d.\n", vpn, offset);
 
 	// Get page entry, set "Accessed" bit to 1;
-	PageEntry page_entry = mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry;
+	page_entry = mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry;
 	page_entry.address |= (unsigned short) 1 << 5;
 	mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry = page_entry;
 
@@ -66,6 +75,10 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 		} else { 
 			printf("Retrieved frame, data in the frame is: '%04d'\n", frame_entry.address);
 		}
+
+		// Add to TLB cache
+		//mmu->tlb_add_entry(&mmu->tlb, page_entry);
+		
 	} else {
 		return -1;
 	}
@@ -87,5 +100,27 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 	
 	//printf("tableentryfromemoryvaluetest12345678: %p\n", &memory->allocated[0].page_entry);
 	return 0;
+}
+
+PageEntry* tlb_search(TLB *tlb, unsigned short virtual_address) {
+	printf("Beginning translate lookaside buffer search...\n");
+	
+	for (unsigned char i = 0; i < tlb->total_entries; i++) {
+		// Check if page matches and return entry
+		unsigned char page = (virtual_address & (unsigned short) 0xFF00) >> 8;
+		if (tlb->entries[i].virt_page == page)
+		{
+			printf("TLB HIT - TLB has an entry for the page number\n");
+			return &tlb->entries[i].pe;
+		}
+	}
+	
+	// TLB MISS
+	printf("TLB MISS - No TLB entries matching the page number.\n");
+	return NULL;
+}
+
+void tlb_add_entry(struct TLB *tlb, PageEntry pe) {
+	printf("GOING IN");
 }
 
