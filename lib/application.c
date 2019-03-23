@@ -11,7 +11,8 @@ Application new_application() {
 
 	Application application = { start, clear_screen, write_txt_files,
 															write_physical_memory, write_page_table,
-															write_external_disk, user_prompt };
+															write_external_disk, write_tlb,
+															user_prompt };
 	return application;
 }
 
@@ -35,6 +36,7 @@ void start(struct Application* app) {
 	unsigned char external_address_size = 16;
 	app->ssd.size = pow(2, external_address_size);
 	app->ssd.memory.allocated = malloc(pow(2, external_address_size));
+	app->tlb.entries = malloc(16 * sizeof(TLBEntry));
 
 	// Give reference to external disk to page supervisor
 	app->page_supervisor.ssd = app->ssd;
@@ -104,6 +106,7 @@ void write_txt_files(struct Application *app) {
   app->write_physical_memory(&app->cpu.mmu);
 	app->write_page_table(&app->cpu.mmu);
 	app->write_external_disk(&app->page_supervisor);
+	app->write_tlb(&app->tlb);
 }
 
 /* 
@@ -208,6 +211,9 @@ void write_external_disk(struct PageSupervisor *page_supervisor) {
 		}
 	}
 	fclose(edf);
+}
+
+void write_tlb(struct TLB *tlb) {
 }
 
 unsigned short user_prompt() {

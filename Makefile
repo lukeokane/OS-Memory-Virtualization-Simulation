@@ -15,6 +15,8 @@ OBJECTS = $(DIST_DIR)/main.o\
 	  $(DIST_DIR)/page_tables_info.o\
 	  $(DIST_DIR)/print_util.o\
 	  $(DIST_DIR)/external_disk.o\
+	  $(DIST_DIR)/tlb_entry.o\
+	  $(DIST_DIR)/tlb.o\
 
 # "-lm" links math.h implementaton to memory.o
 
@@ -93,6 +95,16 @@ $(DIST_DIR)/print_util.o: $(LIB_DIR)/print_util.c
 # Depends on external_disk.c to be present in order to compile
 $(DIST_DIR)/external_disk.o: $(LIB_DIR)/external_disk.c
 	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/external_disk.o
+
+# Target compiles tlb.c into an object (.o) file
+# Depends on tlb.c to be present in order to compile
+$(DIST_DIR)/tlb.o: $(LIB_DIR)/tlb.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/tlb.o
+
+# Target compiles tlb_entry.c into an object (.o) file
+# Depends on tlb_entry.c to be present in order to compile
+$(DIST_DIR)/tlb_entry.o: $(LIB_DIR)/tlb_entry.c
+	$(CC) $(CFLAGS) $? -o $(DIST_DIR)/tlb_entry.o
 
 # Remove all built files, and re-create the dist directory
 clean:
