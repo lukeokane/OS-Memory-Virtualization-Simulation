@@ -1,7 +1,10 @@
 #ifndef APPLICATION_H
 #define  APPLICATION_H
 #include "cpu.h"
+#include "memory.h"
 #include "page_supervisor.h"
+#include "external_disk.h"
+#include "print_util.h"
 
 // data type for defining the application
 typedef struct Application {
@@ -12,11 +15,14 @@ typedef struct Application {
 	void (*write_txt_files)(struct Application *app);
 	void (*write_physical_memory)(struct MemoryManagementUnit *mmu);
 	void (*write_page_table)(struct MemoryManagementUnit *mmu);
+	void (*write_external_disk)(struct PageSupervisor *page_supervisor);
 	unsigned short (*user_prompt)();
 	
 	// Member variables
 	CPU cpu;
+	Memory memory;
 	PageSupervisor page_supervisor;
+	ExternalDisk ssd;
 	
 } Application;
 
@@ -37,6 +43,9 @@ void write_physical_memory(struct MemoryManagementUnit *mmu);
 
 // Write out page tables in physical memory
 void write_page_table(struct MemoryManagementUnit *mmu);
+
+// Write out frames in external disk
+void write_external_disk(struct PageSupervisor *page_supervisor);
 
 unsigned short user_prompt();
 

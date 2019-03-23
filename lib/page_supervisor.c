@@ -8,7 +8,8 @@
  *
  */
 PageSupervisor new_page_supervisor() {
-	PageSupervisor page_supervisor = { populate_random_data, init_process_page_table };
+	PageSupervisor page_supervisor = { populate_random_data, init_process_page_table,
+					   page_to_external, page_to_memory};
 	return page_supervisor;
 }
 
@@ -32,14 +33,11 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 	// Get number of frame entries possible with the random bytes
 	unsigned short frame_entry_amount = random_bytes / sizeof(unsigned char);
 
-	printf("Pseudorandomly generated number of bytes to write: %d", random_bytes, frame_entry_amount);
+	printf("Pseudorandomly generated number of bytes to write: %d\n", random_bytes);
 	printf("Beginning writing of pseudorandom data to pseudorandom memory locations...\n");
 
 	unsigned short page_tables_bytes_allocated = page_supervisor->pti.page_table_size_bytes * page_supervisor->pti.page_tables_counter;
 	
-	// Get total amount of page table entries
-	unsigned short page_tables_entries_amount = page_tables_bytes_allocated / page_supervisor->pti.page_size_bytes;
-
 	// Create page tables
 	for (unsigned short i = 0; i < page_tables_bytes_allocated; i += 2) {
 		
@@ -60,9 +58,9 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 		page_entry.address |= (unsigned short) 1 << 1;
 
 		// Add page entry to memory
-		printf("Page entry in memory place: %d\n", i);
 		page_supervisor->memory.allocated[i].page_entry = page_entry;
 	}
+
 	for (unsigned short i = 0; i < frame_entry_amount; i++) {
 		// Write frame entry to pseudorandom memory address that is not used by page tables. 
 		unsigned short random_free_address = rand() % (int) (pow(2, (double) page_supervisor->pti.address_space) - page_tables_bytes_allocated) + page_tables_bytes_allocated;
@@ -81,13 +79,6 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 			// address: 			0x3039 (12345 bytes)
 			// mask:					0xFF00
 			// frame number:	0x3000 (12288 bytes)
-			unsigned short frame_mask = 0xFF00;
-			unsigned short frame_number = random_free_address & frame_mask;
-
-			// Get current page table entry offset to corresponding frame entry offset 
-			unsigned short frame_offset = i % page_supervisor->pti.page_table_size_bytes; 
-			unsigned short frame_entry_address = frame_number + frame_offset; 
-			//printf("frame number address is: %4u, frame number address will be: %4u since offset is %d\n", frame_number, frame_entry_address, i % page_supervisor->pti.page_table_size_bytes); 
  
 			// Get random number or alphabetic character and store in frame_entry 
 			unsigned char random_ascii = rand() % (0x5A - 0x30) + 0x30; 
@@ -96,15 +87,29 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
  
 			// Write frame entry to memory 
 			page_supervisor->memory.allocated[random_free_address].frame_entry = frame_entry;
-			if (frame_entry.address >= 90) {
-			printf("char %c (%d) is now in %d\n", frame_entry.address, frame_entry.address, random_free_address);
-			}
 		}
 		// if modulus is not 0, need reduce i to attempt to get a valid address
 	  else {
 			i--;
 		}
 	}
+
+	// Adding two page entries to external memory
+	PageEntry page2 = page_supervisor->memory.allocated[2 * page_supervisor->pti.page_size_bytes].page_entry;
+	// Set present bit as '0'
+	page2.address &= ~( (unsigned short) 1 << 0);
+	page_supervisor->memory.allocated[2 * page_supervisor->pti.page_size_bytes].page_entry = page2;
+
+	
+	// Add two pages to external memory
+	page_supervisor->page_to_external(page_supervisor, 2 * page_supervisor->pti.page_table_size_bytes);
+		page_supervisor->page_to_external(page_supervisor, 13 * page_supervisor->pti.page_table_size_bytes);
+
+	PageEntry page13 = page_supervisor->memory.allocated[13 * page_supervisor->pti.page_size_bytes].page_entry;
+	page13.address &= ~( (unsigned short) 1 << 0);
+	page_supervisor->memory.allocated[13 * page_supervisor->pti.page_size_bytes].page_entry = page13;
+	
+
 	printf("%d data entries successfully written.\n", frame_entry_amount);
 }
 
@@ -171,4 +176,64 @@ PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor) 
 	page_supervisor->pti.page_tables_counter = i;
 
 	return &page_supervisor->pti;
+}
+
+signed char page_to_external(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
+	
+	// Get page number
+	unsigned short page_num = (virtual_address & (unsigned short) 0xFF00) / page_supervisor->pti.page_table_size_bytes;
+
+	// Get page entry's frame number
+	PageEntry page = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;	
+	unsigned short frame_number = page.address & (unsigned short) 0xFF00;
+	printf("Page Supervisor has found PT entry to page out at page at location 0x%04X.\n", page_num * page_supervisor->pti.page_size_bytes);
+
+	// Write all frames to external disk
+	for (unsigned short i = 0; i < page_supervisor->pti.page_table_size_bytes; i++) {
+
+		//Page supervisor transfers page frame entry to external disk
+		FrameEntry fe;
+		fe.address = page_supervisor->memory.allocated[frame_number + i].frame_entry.address;
+		page_supervisor->ssd.memory.allocated[frame_number + i].frame_entry = fe;
+		// Wipe entry, to show the correct entry is being interacted with
+		fe.address = 0x00;
+		page_supervisor->memory.allocated[frame_number + i].frame_entry = fe;
+	}
+	printf("Page %d moved from physical memory to external disk.\n", page_num);
+	unsigned short last_frame_entry_no = (frame_number + page_supervisor->pti.page_table_size_bytes) - 1;
+	printf("(Frame entries 0x%04X to 0x%04X have been wiped from physical memory)\n", frame_number, last_frame_entry_no);
+
+	return 0;
+}
+
+signed char page_to_memory(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
+
+	// Get page number
+	unsigned short page_num = (virtual_address & (unsigned short) 0xFF00) / page_supervisor->pti.page_table_size_bytes;
+	
+	// Get page entry's frame number
+	PageEntry page = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;	
+	unsigned short frame_number = page.address & (unsigned short) 0xFF00;  	
+
+	// Write all frames to memory
+	for (unsigned short i = 0; i < page_supervisor->pti.page_table_size_bytes; i++) {
+		//Page supervisor transfers page frame entry to memory.
+		FrameEntry fe;
+		fe.address = page_supervisor->ssd.memory.allocated[frame_number + i].frame_entry.address;
+		page_supervisor->memory.allocated[frame_number + i].frame_entry = fe;
+		// Wipe entry, to show the correct entry is being interacted with
+		fe.address = 0x00;
+		page_supervisor->ssd.memory.allocated[frame_number + i].frame_entry = fe;
+	}
+	printf("Page %d moved from external disk to physical memory.\n", page_num);
+	unsigned short last_frame_entry_no = (frame_number + page_supervisor->pti.page_table_size_bytes) - 1;
+	printf("(Frame entries 0x%04X to 0x%04X have been wiped from external disk)\n", frame_number, last_frame_entry_no);
+	
+	// Set page entry's 'present' bit to 1
+	PageEntry pe = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;
+	pe.address |= (unsigned short) 1;
+	page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry = pe;
+	printf("PT Entry has been updated, 'present' bit set to 1.");
+
+	return 0;
 }
