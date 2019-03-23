@@ -106,8 +106,8 @@ void tlb_add_entry(struct TLB *tlb, PageEntry pe, unsigned short vpn) {
 	tlb_entry.pe = pe;
 	tlb_entry.virt_page = vpn;
 	// TLB is full, perform FIFO algorithm
-	if (tlb->total_entries == tlb->max_entries) {
-		for (unsigned char i = tlb->max_entries; i>0; i--) {
+	if (tlb->total_entries == tlb->max_entries -1) {
+		for (unsigned char i = tlb->max_entries; i> 0; i--) {
 			tlb->entries[i] = tlb->entries[i -1];
 		}
 		tlb->entries[0] = tlb_entry;
