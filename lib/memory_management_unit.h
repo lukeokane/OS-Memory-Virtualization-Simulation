@@ -9,7 +9,7 @@
 typedef struct MemoryManagementUnit { 
  
 	// Functions
-	FrameEntry (*translate_virtual_address)(struct MemoryManagementUnit *mmu, unsigned short virtual_address);
+	signed char (*translate_virtual_address)(struct MemoryManagementUnit *mmu, unsigned short virtual_address);
 
 	/* Member variables */
  	Memory memory;
@@ -23,7 +23,7 @@ typedef struct MemoryManagementUnit {
 MemoryManagementUnit new_mmu();
 
 // Translate virtual address to a physical address
-FrameEntry translate_virtual_address(MemoryManagementUnit *mmu, unsigned short virtual_address);
+signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short virtual_address);
 
 #endif 
 
