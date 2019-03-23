@@ -40,14 +40,15 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 	{
 		printf("TLB HIT - TLB has an entry for the page number\n");
 		page_entry.address = page_entry_tlb->address;
-	}
+	} else {
+	printf("TLB MISS - TLB does not have an entry for the page number");
 	printf("Searching page entry in page %d, offset %d.\n", vpn, offset);
 
 	// Get page entry, set "Accessed" bit to 1;
 	page_entry = mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry;
 	page_entry.address |= (unsigned short) 1 << 5;
 	mmu->memory.allocated[vpn * mmu->pti.page_size_bytes].page_entry = page_entry;
-
+	}
 	// Print page entry
 	printf("\n");	
 	page_entry_header();
