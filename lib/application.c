@@ -60,7 +60,7 @@ void start(struct Application* app) {
 	page_entry_legend();
 	page_entry_header();
 	PageEntry pe;
-	pe.address = 0x3F13;
+	pe.address = 0x3F23;
 	print_page_entry(pe);
 
 	// Write populated data to .txt files
