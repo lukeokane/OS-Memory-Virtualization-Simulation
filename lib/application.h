@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "page_supervisor.h"
 #include "external_disk.h"
+#include "tlb.h"
 #include "print_util.h"
 
 // data type for defining the application
@@ -16,6 +17,7 @@ typedef struct Application {
 	void (*write_physical_memory)(struct MemoryManagementUnit *mmu);
 	void (*write_page_table)(struct MemoryManagementUnit *mmu);
 	void (*write_external_disk)(struct PageSupervisor *page_supervisor);
+	void (*write_tlb)(struct TLB *tlb);
 	unsigned short (*user_prompt)();
 	
 	// Member variables
@@ -23,6 +25,7 @@ typedef struct Application {
 	Memory memory;
 	PageSupervisor page_supervisor;
 	ExternalDisk ssd;
+	TLB tlb;
 	
 } Application;
 
@@ -46,6 +49,8 @@ void write_page_table(struct MemoryManagementUnit *mmu);
 
 // Write out frames in external disk
 void write_external_disk(struct PageSupervisor *page_supervisor);
+
+void write_tlb(struct TLB *tlb);
 
 unsigned short user_prompt();
 
