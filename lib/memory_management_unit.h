@@ -11,8 +11,8 @@ typedef struct MemoryManagementUnit {
  
 	// Functions
 	signed char (*translate_virtual_address)(struct MemoryManagementUnit *mmu, unsigned short virtual_address);
-	PageEntry* (*tlb_search)(struct TLB *tlb, unsigned short virtual_address);
-	void (*tlb_add_entry)(struct TLB *tlb, PageEntry pe);
+	PageEntry* (*tlb_search)(struct TLB *tlb, unsigned short page_number);
+	void (*tlb_add_entry)(struct TLB *tlb, PageEntry pe, unsigned short vpn);
 	/* Member variables */
  	Memory memory;
 	PageTablesInfo pti;
@@ -30,7 +30,6 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 
 PageEntry* tlb_search(struct TLB *tlb, unsigned short virtual_address);
 
-void tlb_add_entry(struct TLB *tlb, PageEntry pe);
+void tlb_add_entry(struct TLB *tlb, PageEntry pe, unsigned short vpn);
 
 #endif 
-

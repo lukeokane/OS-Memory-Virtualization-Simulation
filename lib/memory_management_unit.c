@@ -30,13 +30,15 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 
 	//printf("Address 0x%X = VPN: 0x%X maps to address 0x%X, offset: 0x%X\n", virtual_address, vpn, vpn * mmu->pti.page_size_bytes, offset);
 
-	// Search in TLB for entry
-	PageEntry* page_entry_tlb = mmu->tlb_search(&mmu->tlb, virtual_address);
+	printf("Searching translate lookaside buffer for page entry...\n"); 
+	// Search in TLB for entry 
+	PageEntry* page_entry_tlb = mmu->tlb_search(&mmu->tlb, vpn); 
 	
 	PageEntry page_entry;
 
 	if (page_entry_tlb != NULL)
 	{
+		printf("TLB HIT - TLB has an entry for the page number\n");
 		page_entry.address = page_entry_tlb->address;
 	}
 	printf("Searching page entry in page %d, offset %d.\n", vpn, offset);
@@ -53,10 +55,6 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 	printf("\n");
 
 	char present_bit = (page_entry.address >> 0) & 1;
-
-	// TODO: READ PAGE ENTRIES AFTER DOING POPULATING DATA
-	// TODO: CHECKING IF PAGE IS VALID BUT NEEDS TO THROW PAGE FAULT
-	// ... OR THROW IF THE PAGE ENTRY IS BLANK
 
 	if (present_bit == 1) {
 
@@ -77,50 +75,46 @@ signed char translate_virtual_address(MemoryManagementUnit *mmu, unsigned short 
 		}
 
 		// Add to TLB cache
-		//mmu->tlb_add_entry(&mmu->tlb, page_entry);
+		mmu->tlb_add_entry(&mmu->tlb, page_entry, vpn);
 		
 	} else {
 		return -1;
 	}
 	
-	// TODO: READ PAGE ENTRIES AFTER DOING POPULATING DATA
-	// TODO: CHECKING IF PAGE IS VALID BUT NEEDS TO THROW PAGE FAULT
-	// ... OR THROW IF THE PAGE ENTRY IS BLANK
-	//PageEntry page = (vpn * mmu->pti.page_table_size_bytes) + offset;
-
-	// Get frame
-	// Calculate bytes taken by page tables
-	//unsigned short page_tables_memory = mmu->pti.page_tables_counter * mmu->pti.page_table_size_bytes;
-	//printf("Page table size bytes: %d\n", page_tables_memory);
-	//unsigned short frame = (vpn * mmu->pti.page_table_size_bytes) + page_tables_memory;
-	//unsigned short frame_with_offset = frame + offset;
-	//printf("Start location of frame is: %d\n", frame);
-	//printf("frame with offset is: %d\n", frame_with_offset);
-
-	
-	//printf("tableentryfromemoryvaluetest12345678: %p\n", &memory->allocated[0].page_entry);
 	return 0;
 }
 
 PageEntry* tlb_search(TLB *tlb, unsigned short virtual_address) {
-	printf("Beginning translate lookaside buffer search...\n");
-	
+
 	for (unsigned char i = 0; i < tlb->total_entries; i++) {
 		// Check if page matches and return entry
-		unsigned char page = (virtual_address & (unsigned short) 0xFF00) >> 8;
-		if (tlb->entries[i].virt_page == page)
+		if (tlb->entries[i].virt_page == virtual_address)
 		{
-			printf("TLB HIT - TLB has an entry for the page number\n");
+			// TLB HIT
 			return &tlb->entries[i].pe;
 		}
 	}
 	
 	// TLB MISS
-	printf("TLB MISS - No TLB entries matching the page number.\n");
 	return NULL;
 }
 
-void tlb_add_entry(struct TLB *tlb, PageEntry pe) {
-	printf("GOING IN");
+void tlb_add_entry(struct TLB *tlb, PageEntry pe, unsigned short vpn) {
+
+	TLBEntry tlb_entry;
+	tlb_entry.pe = pe;
+	tlb_entry.virt_page = vpn;
+	// TLB is full, perform FIFO algorithm
+	if (tlb->total_entries == tlb->max_entries) {
+		for (unsigned char i = tlb->max_entries; i>0; i--) {
+			tlb->entries[i] = tlb->entries[i -1];
+		}
+		tlb->entries[0] = tlb_entry;
+	}
+ 	else {
+		tlb->entries[tlb->total_entries] = tlb_entry;
+		tlb->total_entries++;
+	}
+	printf("Page written to TLB.\n");
 }
 
