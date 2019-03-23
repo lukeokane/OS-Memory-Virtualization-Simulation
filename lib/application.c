@@ -60,7 +60,7 @@ void start(struct Application* app) {
 	page_entry_legend();
 	page_entry_header();
 	PageEntry pe;
-	pe.address = 0x3F13;
+	pe.address = 0x3F23;
 	print_page_entry(pe);
 
 	// Write populated data to .txt files
@@ -145,11 +145,11 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 
 	FILE *ptf = fopen("./data/page_table.txt", "w+");
 	// Legend
-	fprintf(ptf, "PAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\nPCD  - Page-level cache disable\n");
-	fprintf(ptf, "PWT  - Page-level write-through\nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
+	fprintf(ptf, "PAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\n*NU* - Not Used\n");
+	fprintf(ptf, "*NU* - Not Used \nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
 	// Table layout
-	fprintf(ptf, "  Page  |                    Page Table Entry                 |\n");
-	fprintf(ptf, "        |    FN    | *NU* | D | A | PCD | PWT | U/S | R/W | P |\n");
+	fprintf(ptf, "  Page  |                    Page Table Entry                   |\n");
+	fprintf(ptf, "        |    FN    | *NU* | D | A | *NU* | *NU* | U/S | R/W | P |\n");
 	fprintf(ptf, "---------------------------------------------------------------\n");
 
 	unsigned short entries_per_table = mmu->pti.page_table_size_bytes / mmu->pti.page_size_bytes;
@@ -178,7 +178,7 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 	unsigned char RorW = (page_entry.address >> 1) & 1;
 	unsigned char P = (page_entry.address >> 0) & 1;
 	
-	fprintf(ptf, "0x%04X  |  0x%04X  |   %d  | %d | %d |  %d  |  %d  |  %d  |  %d  | %d |\n", i, FN, NU, D, A, PCD, PWT, UorS, RorW, P);
+	fprintf(ptf, "0x%04X  |  0x%04X  |   %d  | %d | %d |   %d  |   %d  |  %d  |  %d  | %d |\n", i, FN, NU, D, A, PCD, PWT, UorS, RorW, P);
 
 	}
 
