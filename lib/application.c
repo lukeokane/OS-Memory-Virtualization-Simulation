@@ -145,8 +145,8 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 
 	FILE *ptf = fopen("./data/page_table.txt", "w+");
 	// Legend
-	fprintf(ptf, "PAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\nNU - Not Used\n");
-	fprintf(ptf, "NU - Not Used \nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
+	fprintf(ptf, "PAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\n*NU* - Not Used\n");
+	fprintf(ptf, "*NU* - Not Used \nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
 	// Table layout
 	fprintf(ptf, "  Page  |                    Page Table Entry                   |\n");
 	fprintf(ptf, "        |    FN    | *NU* | D | A | *NU* | *NU* | U/S | R/W | P |\n");
