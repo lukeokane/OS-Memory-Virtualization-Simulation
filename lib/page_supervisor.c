@@ -102,13 +102,14 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 
 	
 	// Add two pages to external memory
-	page_supervisor->page_to_external(page_supervisor, 2);
-	page_supervisor->page_to_external(page_supervisor, 13);
+	page_supervisor->page_to_external(page_supervisor, 2 * page_supervisor->pti.page_table_size_bytes);
+		page_supervisor->page_to_external(page_supervisor, 13 * page_supervisor->pti.page_table_size_bytes);
 
 	PageEntry page13 = page_supervisor->memory.allocated[13 * page_supervisor->pti.page_size_bytes].page_entry;
 	page13.address &= ~( (unsigned short) 1 << 0);
 	page_supervisor->memory.allocated[13 * page_supervisor->pti.page_size_bytes].page_entry = page13;
 	
+
 	printf("%d data entries successfully written.\n", frame_entry_amount);
 }
 
@@ -177,7 +178,10 @@ PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor) 
 	return &page_supervisor->pti;
 }
 
-void page_to_external(struct PageSupervisor* page_supervisor, unsigned short page_num) {
+void page_to_external(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
+	
+	// Get page number
+	unsigned short page_num = (virtual_address & (unsigned short) 0xFF00) / page_supervisor->pti.page_table_size_bytes;
 
 	// Get page entry's frame number
 	PageEntry page = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;	
@@ -196,11 +200,14 @@ void page_to_external(struct PageSupervisor* page_supervisor, unsigned short pag
 	}
 	printf("Page %d moved from physical memory to external disk.\n", page_num);
 	unsigned short last_frame_entry_no = (frame_number + page_supervisor->pti.page_table_size_bytes) - 1;
-	printf("(Frame entries 0x%04X to 0x%04X have been wiped from physical memoery)\n", frame_number, last_frame_entry_no);
+	printf("(Frame entries 0x%04X to 0x%04X have been wiped from physical memory)\n", frame_number, last_frame_entry_no);
 }
 
-void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short page_num) {
+void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short virtual_address) {
 
+	// Get page number
+	unsigned short page_num = (virtual_address & (unsigned short) 0xFF00) / page_supervisor->pti.page_table_size_bytes;
+	
 	// Get page entry's frame number
 	PageEntry page = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;	
 	unsigned short frame_number = page.address & (unsigned short) 0xFF00;  	
@@ -213,10 +220,14 @@ void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short page_
 		page_supervisor->memory.allocated[frame_number + i].frame_entry = fe;
 		// Wipe entry, to show the correct entry is being interacted with
 		fe.address = 0x00;
-		page_supervisor->memory.allocated[frame_number + i].frame_entry = fe;
+		page_supervisor->ssd.memory.allocated[frame_number + i].frame_entry = fe;
 	}
 	printf("Page %d moved from external disk to physical memory.\n", page_num);
 	unsigned short last_frame_entry_no = (frame_number + page_supervisor->pti.page_table_size_bytes) - 1;
 	printf("(Frame entries 0x%04X to 0x%04X have been wiped from external disk)\n", frame_number, last_frame_entry_no);
 	
+	// Set page entry's 'present' bit to 1
+	PageEntry pe = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;
+	pe.address |= (unsigned short) 1;
+	page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry = pe;
 }
