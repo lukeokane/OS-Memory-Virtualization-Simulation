@@ -38,6 +38,7 @@ FrameEntry frame_entry = mmu->memory.allocated[frame_no + page_offset].frame_ent
 mmu->memory.allocated[frame_no + page_offset].frame_entry = frame_entry;
 ```
 * Referencing, e.g MMU and Page Supervisor (page fault handling S/W) have references to the simulated physical memory block of memory.
+* Translation lookaside buffer using FIFO replacement algorithm
 * Memory Management Unit - Virtual address translation
   * Bitwise operations (e.g. shifting, AND for masking, setting page entry bits to 0 or 1)
 * External disk with two pages written to it (note: issue with random data in external disk array in some places, however paged data is still accurate.)
