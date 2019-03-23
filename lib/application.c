@@ -11,7 +11,7 @@ Application new_application() {
 
 	Application application = { start, clear_screen, write_txt_files,
 															write_physical_memory, write_page_table,
-															user_prompt };
+															write_external_disk, user_prompt };
 	return application;
 }
 
@@ -26,13 +26,18 @@ void start(struct Application* app) {
 	printf("Application started...\n");
 
 	// Initialize External Disk, Page Supervisor and MMU instance
-	unsigned char addressSize = 16;
+	// Cannot use malloc() in a function to create an instance of a data type, ...
+	// causes MAJOR	problem with different variables pointing to same address
+	unsigned char address_size = 16;
 	app->page_supervisor = new_page_supervisor();
-	app->memory = new_memory(addressSize);
+	app->memory.allocated = malloc(pow(2, (double) address_size));
 	app->cpu.mmu = new_mmu();
-	//app->ssd = new_external_disk((unsigned char) 8);
-	// Initialize external disk and give reference to page supervisor
-	app->page_supervisor.ssd = new_external_disk((unsigned char) 8);
+	unsigned char external_address_size = 16;
+	app->ssd.size = pow(2, external_address_size);
+	app->ssd.memory.allocated = malloc(pow(2, external_address_size));
+
+	// Give reference to external disk to page supervisor
+	app->page_supervisor.ssd = app->ssd;
 
 	printf("Creating physical memory...\n");
 
@@ -72,13 +77,14 @@ void clear_screen() {
 
 /* 
  * Write out physical memory contents and physical memory's page table's...
- * contents to 2 txt files
+ * contents to 3 txt files
  * @return void
  *
  */
 void write_txt_files(struct Application *app) {
   app->write_physical_memory(&app->cpu.mmu);
 	app->write_page_table(&app->cpu.mmu);
+	app->write_external_disk(&app->page_supervisor);
 }
 
 /* 
@@ -89,9 +95,6 @@ void write_txt_files(struct Application *app) {
 void write_physical_memory(struct MemoryManagementUnit *mmu) {
 	
 	FILE *pmf = fopen("./data/physical_memory.txt", "w+");
-	
-	fprintf(pmf, "NOTE: While the addresses printed are correct, there is an issue with memory from another variable overlapping the physical memory array.\n");
-	fprintf(pmf, "So junk data will appear in areas, did not have time to fix the issue.\n");
 
 	fprintf(pmf, "  Address   | Frame Number | Offset |   Content   |\n"); 
 	fprintf(pmf, "--------------------------------------------------|\n");
@@ -163,6 +166,27 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 	// Close stream
 	fclose(ptf);
 
+}
+
+void write_external_disk(struct PageSupervisor *page_supervisor) {
+	FILE *edf = fopen("./data/external_disk.txt", "w+");
+	
+	fprintf(edf, "  Ext. Disk Addr.  | Content |\n"); 
+	fprintf(edf, "-----------------------------|\n");
+
+	printf("SIZE: %d\n", page_supervisor->ssd.size);
+	for (unsigned int i = 0; i < page_supervisor->ssd.size; i++) {
+		FrameEntry fe = page_supervisor->ssd.memory.allocated[i].frame_entry;
+
+		char null_text[] = "null";
+		if (fe.address != 0x0) {
+			fprintf(edf, "   0x%04X   | %4c  (%d)  |\n", i, fe.address, fe.address);
+		}
+		else {
+			fprintf(edf, "   0x%04X   |   %s (%d)  |\n", i, null_text, fe.address);
+		}
+	}
+	fclose(edf);
 }
 
 unsigned short user_prompt() {

@@ -189,13 +189,16 @@ void page_to_external(struct PageSupervisor* page_supervisor, unsigned short pag
 	for (unsigned short i = 0; i < page_supervisor->pti.page_table_size_bytes; i++) {
 		printf("%d\n", i);
 		
-		// Page supervisor transfers page frame entries to external memory
-		//FrameEntry *fe = &page_supervisor->ssd.memory.allocated[ed_free_address_block + i].frame_entry;
-		//fe->address= 0xFFF;
-		page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
+		//Page supervisor transfers page frame entries to external memory
+		FrameEntry fe;
+		fe.address = page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
+		page_supervisor->ssd.memory.allocated[ed_free_address_block + i].frame_entry.address = fe.address;
+		//page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
 		//page_supervisor->ssd.memory.allocated[ed_free_address_block + i].frame_entry = fe;
 	}
 	printf("Page %d moved from physical memory to external memory.\n", page_num);
 	// Add how many addresses are filled in external disk
-	//page_supervisor->ssd.addresses_filled += page_supervisor->pti.page_table_size_bytes;
+	printf("before: %d\n", page_supervisor->ssd.addresses_filled);
+	page_supervisor->ssd.addresses_filled += page_supervisor->pti.page_table_size_bytes;
+	printf("after: %d\n", page_supervisor->ssd.addresses_filled);
 }

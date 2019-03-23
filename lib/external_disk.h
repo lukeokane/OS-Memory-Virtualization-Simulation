@@ -10,10 +10,8 @@ typedef struct ExternalDisk {
 	// Entries are filled linear.
 	// if had more time, would track page frames
 	unsigned short addresses_filled;
+	unsigned short size;
 
 } ExternalDisk;
-
-// Instance of ExternalDisk with memory allocated
-ExternalDisk new_external_disk(unsigned char addressSize);
 
 #endif
