@@ -190,8 +190,8 @@ void write_page_table(struct MemoryManagementUnit *mmu) {
 void write_external_disk(struct PageSupervisor *page_supervisor) {
 	FILE *edf = fopen("./data/external_disk.txt", "w+");
 	
-	fprintf(edf, "NOTE: While the addresses printed are correct, there is an issue with memory from another variable overlapping the external disk array.\n");
-	fprintf(edf, "So junk data will appear in a small area, did not have time to fix the issue.\n\n");
+	fprintf(edf, "NOTE: While the addresses returned from swapping are correct, there is an issue with memory from another variable overlapping the external disk array.\n");
+	fprintf(edf, "So junk data will appear in areas, but the 2 pages swapped out at the beginning are correct. Did not have time to fix the issue.\n\n");
 
 	fprintf(edf, "  Ext. Disk Addr.  | Content  |\n"); 
 	fprintf(edf, "------------------------------|\n");
