@@ -16,10 +16,9 @@ typedef struct PageSupervisor {
 	void (*populate_random_data)(struct PageSupervisor* page_supervisor);
 	PageTablesInfo* (*init_process_page_table)(struct PageSupervisor* page_supervisor);
 	void (*page_to_external)(struct PageSupervisor* page_supervisor, unsigned short page_num);
+	void (*page_to_memory)(struct PageSupervisor* page_supervisor, unsigned short page_num);
 	
 	/* Member variables */
-
-	// Page table information
 	PageTablesInfo pti;
 	Memory memory;
 	ExternalDisk ssd;
@@ -37,4 +36,5 @@ PageTablesInfo* init_process_page_table(struct PageSupervisor* page_supervisor);
 
 void page_to_external(struct PageSupervisor* page_supervisor, unsigned short page_num);
 
+void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short page_num);
 #endif 

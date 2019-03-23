@@ -9,7 +9,7 @@
  */
 PageSupervisor new_page_supervisor() {
 	PageSupervisor page_supervisor = { populate_random_data, init_process_page_table,
-					   page_to_external };
+					   page_to_external, page_to_memory};
 	return page_supervisor;
 }
 
@@ -102,7 +102,8 @@ void populate_random_data(struct PageSupervisor* page_supervisor) {
 
 	
 	// Add to external memory
-	page_supervisor->page_to_external(page_supervisor, 2);
+	page_supervisor->page_to_external(page_supervisor, 0);
+	//page_supervisor->page_to_memory(page_supervisor, 0);
 
 	PageEntry page13 = page_supervisor->memory.allocated[13 * page_supervisor->pti.page_size_bytes].page_entry;
 	page13.address &= ~( (unsigned short) 1 << 0);
@@ -184,15 +185,17 @@ void page_to_external(struct PageSupervisor* page_supervisor, unsigned short pag
 	unsigned short frame_number = page.address & (unsigned short) 0xFF00;  	
 	printf("FRAME NUMBER: %04X\n", frame_number);
 
-	//printf("ITERATE TO: %04X\n", frame_number + page_supervisor->pti.page_table_size_bytes);
-	unsigned ed_free_address_block = page_supervisor->ssd.addresses_filled;
+	// Write all frames to external disk
 	for (unsigned short i = 0; i < page_supervisor->pti.page_table_size_bytes; i++) {
-		printf("%d\n", i);
+		//printf("%d\n", i);
 		
-		//Page supervisor transfers page frame entries to external memory
+		//Page supervisor transfers page frame entry to external disk
+		printf("Going to index: %04X", frame_number + i);
 		FrameEntry fe;
-		fe.address = page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
-		page_supervisor->ssd.memory.allocated[ed_free_address_block + i].frame_entry.address = fe.address;
+		fe.address = page_supervisor->memory.allocated[frame_number + i].frame_entry.address;
+		page_supervisor->ssd.memory.allocated[frame_number + i].frame_entry.address = fe.address;
+		fe.address = 0x00;
+		//page_supervisor->memory.allocated[frame_number + i].frame_entry = fe;
 		//page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
 		//page_supervisor->ssd.memory.allocated[ed_free_address_block + i].frame_entry = fe;
 	}
@@ -201,4 +204,32 @@ void page_to_external(struct PageSupervisor* page_supervisor, unsigned short pag
 	printf("before: %d\n", page_supervisor->ssd.addresses_filled);
 	page_supervisor->ssd.addresses_filled += page_supervisor->pti.page_table_size_bytes;
 	printf("after: %d\n", page_supervisor->ssd.addresses_filled);
+}
+
+void page_to_memory(struct PageSupervisor* page_supervisor, unsigned short page_num) {
+
+	printf("MOVING PAGE: %40X\n", page_num * page_supervisor->pti.page_size_bytes);
+	// Get page entry's frame number
+	PageEntry page = page_supervisor->memory.allocated[page_num * page_supervisor->pti.page_size_bytes].page_entry;	
+	unsigned short frame_number = page.address & (unsigned short) 0xFF00;  	
+	printf("FRAME NUMBER: %04X\n", frame_number);
+
+	// Write all frames to memory
+	for (unsigned short i = 0; i < page_supervisor->pti.page_table_size_bytes; i++) {
+		printf("%d\n", i);
+		
+		//Page supervisor transfers page frame entry to memory.
+		FrameEntry fe;
+		fe.address = page_supervisor->ssd.memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
+		page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address = fe.address;
+
+		//page_supervisor->memory.allocated[frame_number + page_supervisor->pti.page_table_size_bytes].frame_entry.address;
+		//page_supervisor->ssd.memory.allocated[ed_free_address_block + i].frame_entry = fe;
+	}
+	printf("Page %d moved from external memory to physical memory.\n", page_num);
+	// Add how many addresses are filled in external disk
+	printf("before: %d\n", page_supervisor->ssd.addresses_filled);
+	page_supervisor->ssd.addresses_filled += page_supervisor->pti.page_table_size_bytes;
+	printf("after: %d\n", page_supervisor->ssd.addresses_filled);
+	
 }

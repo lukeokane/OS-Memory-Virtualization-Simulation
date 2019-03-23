@@ -9,8 +9,8 @@ typedef struct ExternalDisk {
 
 	// Entries are filled linear.
 	// if had more time, would track page frames
-	unsigned short addresses_filled;
-	unsigned short size;
+	unsigned int addresses_filled;
+	unsigned int size;
 
 } ExternalDisk;
 
