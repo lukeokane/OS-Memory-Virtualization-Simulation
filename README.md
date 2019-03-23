@@ -54,7 +54,7 @@ The page entry structure was guided by Intel's implementation of page table entr
   
 The structure implemented is as follows:
   
-![Page entry architecture](https://i.imgur.com/tR9EsUH.jpg)
+![Page entry architecture](https://i.imgur.com/94P3dI5.jpg)
 ### Breakdown (by bit)
 * **0** - Present - if the page is present in physical memory. 1 if present, 0 if in secondary storage.
 * **1** - Read/Write permissions - if 0, the translated frame of this entry can be written to. If 1 then the frame is read-only.
