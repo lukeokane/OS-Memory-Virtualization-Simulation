@@ -53,8 +53,15 @@ void start(struct Application* app) {
 	// Create page tables and manage via Page Supervisor software, give MMU reference to page tables
 	app->cpu.mmu.pti = *app->page_supervisor.init_process_page_table(&app->page_supervisor);
 
-	// Populate page tables & write random data to process.
+	// Populate page tables & write random data to memory.
 	app->page_supervisor.populate_random_data(&app->page_supervisor);
+
+	// Print human readable description of page table entry structure
+	page_entry_legend();
+	page_entry_header();
+	PageEntry pe;
+	pe.address = 0x3F13;
+	print_page_entry(pe);
 
 	// Write populated data to .txt files
 	app->write_txt_files(app);
@@ -203,7 +210,7 @@ void write_external_disk(struct PageSupervisor *page_supervisor) {
 unsigned short user_prompt() {
 	printf("\n\n---------------------------------- USER INPUT ---------------------------------------------\n");
 	printf("-------------------------------------------------------------------------------------------\n");
-	printf("NOTE: 2 page entries (page 2 and 13) are not in memory, their virtual memory addresses are:\n");
+	printf("NOTE: 2 page entries (page 2 and 13) are stored externally, their virtual memory addresses are:\n");
 	printf("Page 2: 0x0200 to 0x02FF\n");
 	printf("Page 13: 0x0D00 to 0x0DFF\n\n");
 	printf("On every translation, all .txt files are updated with their up to data values.\n\n");

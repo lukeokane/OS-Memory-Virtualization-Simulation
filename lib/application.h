@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "page_supervisor.h"
 #include "external_disk.h"
+#include "print_util.h"
 
 // data type for defining the application
 typedef struct Application {

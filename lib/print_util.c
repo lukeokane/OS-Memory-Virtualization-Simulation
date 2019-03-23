@@ -1,6 +1,12 @@
 #include <stdio.h> 
 #include "print_util.h"
 
+void page_entry_legend() {
+		// Legend
+	printf("\n\nPAGE TABLE ENTRY ARCHITECTURE LEGEND\n-----------\nFN   - Frame number\n*NU* - Not Used\nD    - Dirty\nA    - Accessed\nPCD  - Page-level cache disable\n");
+	printf("PWT  - Page-level write-through\nU/S  - User/supervisor\nR/W  - Read/write\nP    - Present\n----------\n\n");
+}
+
 void page_entry_header() {
 
 	printf("                    Page Table Entry                 \n");
