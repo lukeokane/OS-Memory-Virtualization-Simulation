@@ -46,7 +46,7 @@ mmu->memory.allocated[frame_no + page_offset].frame_entry = frame_entry;
   * Handles paging on page fault exception, tells MMU to begin translation after successful paging.
   * Creates and manages page tables.
 * Random bytes of data between 2048 and 20480 bytes, location of data on physical memory is also random.
-* 3 .txt files containing physical memory data (frames), external disk & page tables respectively.
+* 4 .txt files containing physical memory data (frames), external disk, TLB entries & page tables respectively.
   * Updated on every address translation.
   
 ## Page Entry Architecture
