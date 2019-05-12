@@ -1,6 +1,6 @@
 # Memory Virtualization Simulation
 
-This application simulates memory virtualizaton for a 16 bit virtual address space with a page size of 256 bytes. The system uses a single-level linear page stored in one block of the system's simulated physical memory. The application was received 95.5% score as a part of an Operating Systems module.
+This application simulates memory virtualizaton for a 16 bit virtual address space with a page size of 256 bytes. The system uses a single-level linear page stored in one block of the system's simulated physical memory. The application received 95.5% score as a part of an Operating Systems module.
 
 ## Description of implementation
 * One block of memory for page tables and frames
